@@ -1,0 +1,12 @@
+generated: '2026-10-13'
+method: generated
+source: Generated from openapi/delta-exchange-openapi.yml (operationIds verified verbatim) and the docs at https://docs.delta.exchange/.
+skills:
+- file: delta-exchange-place-and-manage-order.md
+  name: Place and manage an order
+  api: openapi/delta-exchange-openapi.yml
+  operations: [getProduct, getTicker, placeOrder, getOrderById, cancelOrder]
+- file: delta-exchange-portfolio-check.md
+  name: Portfolio check
+  api: openapi/delta-exchange-openapi.yml
+  operations: [getBalances, getMarginedPositions, getOrders, getUserfills, currentRateLimitQuota]

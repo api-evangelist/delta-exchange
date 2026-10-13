@@ -1,0 +1,30 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.delta.exchange/
+name: Delta Exchange India API rate limits
+headers:
+- X-RATE-LIMIT-RESET
+status_code: 429
+limits:
+- name: REST weighted quota
+  limit_text: Default Quota is 20000 for a fixed 5 minute window.
+  max: 20000
+  window: 5 minutes
+  scope: per user ID (authenticated) / per IP (unauthenticated)
+  note: Every REST endpoint has a weight deducted from the 5 minute quota; endpoints not listed cost 1 unit.
+- name: Matching engine operations per product
+  limit_text: The current rate limit is set at 500 operations per second for each product.
+  max: 500
+  window: 1 second
+  scope: per product
+- name: WebSocket connections
+  limit_text: There is a limit of 150 connections every 5 minutes per IP address.
+  max: 150
+  window: 5 minutes
+  scope: per IP address
+  endpoint: wss://socket.india.delta.exchange
+- name: Batch order size
+  limit_text: Max allowed size limit in a batch is 50.
+  max: 50
+  scope: per request
+  endpoint: batchCreate

@@ -1,0 +1,27 @@
+generated: '2026-10-13'
+method: derived
+source: openapi/delta-exchange-openapi.yml
+summary:
+  types:
+  - apiKey
+  api_key_in:
+  - header
+schemes:
+- name: api-key
+  type: apiKey
+  in: header
+  parameter: api-key
+  sources:
+  - openapi/delta-exchange-openapi.yml
+- name: signature
+  type: apiKey
+  in: header
+  parameter: signature
+  sources:
+  - openapi/delta-exchange-openapi.yml
+- name: timestamp
+  type: apiKey
+  in: header
+  parameter: timestamp
+  sources:
+  - openapi/delta-exchange-openapi.yml

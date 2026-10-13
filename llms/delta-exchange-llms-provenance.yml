@@ -1,0 +1,6 @@
+generated: '2026-10-13'
+method: probed
+generator: harvest-llms.py
+source: https://mcp.delta.exchange/llms.txt
+bytes: 2522
+note: saved verbatim; the provider's own document

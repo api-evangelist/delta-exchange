@@ -1,0 +1,248 @@
+generated: '2026-10-13'
+method: derived
+source: https://mcp.delta.exchange/docs/tools + openapi/delta-exchange-openapi.yml
+surfaces:
+  openapi: openapi/delta-exchange-openapi.yml
+  mcp: 'local-stdio: uvx delta-exchange-mcp (no remote endpoint)'
+crosswalk:
+- tool: get_ticker
+  category: market-data
+  rest:
+  - getTicker
+  binding: name-semantic
+  confidence: high
+- tool: list_tickers
+  category: market-data
+  rest:
+  - getTickers
+  binding: name-semantic
+  confidence: high
+- tool: get_product
+  category: market-data
+  rest:
+  - getProduct
+  binding: name-semantic
+  confidence: high
+- tool: list_products
+  category: market-data
+  rest:
+  - getProducts
+  binding: name-semantic
+  confidence: high
+- tool: get_orderbook
+  category: market-data
+  rest:
+  - getL2Orderbook
+  binding: name-semantic
+  confidence: high
+- tool: get_recent_trades
+  category: market-data
+  rest:
+  - getTrades
+  binding: name-semantic
+  confidence: high
+- tool: get_candles
+  category: market-data
+  rest:
+  - getCandles
+  binding: name-semantic
+  confidence: high
+- tool: get_options_chain
+  category: market-data
+  rest:
+  - getOptionChain
+  binding: name-semantic
+  confidence: high
+- tool: get_indices
+  category: market-data
+  rest:
+  - getIndices
+  binding: name-semantic
+  confidence: high
+- tool: get_positions
+  category: account
+  rest:
+  - getPositions
+  binding: name-semantic
+  confidence: high
+- tool: get_margined_positions
+  category: account
+  rest:
+  - getMarginedPositions
+  binding: name-semantic
+  confidence: high
+- tool: get_product_leverage
+  category: account
+  rest:
+  - getOrderLeverage
+  binding: name-semantic
+  confidence: medium
+- tool: get_wallet_balances
+  category: account
+  rest:
+  - getBalances
+  binding: name-semantic
+  confidence: high
+- tool: get_wallet_transactions
+  category: account
+  rest:
+  - getTransactions
+  binding: name-semantic
+  confidence: high
+- tool: get_fills
+  category: account
+  rest:
+  - getUserfills
+  binding: name-semantic
+  confidence: high
+- tool: bulk_fills_export
+  category: account
+  rest:
+  - downloadFillsHistory
+  binding: name-semantic
+  confidence: high
+- tool: get_order_history
+  category: account
+  rest:
+  - getOrderHistory
+  binding: name-semantic
+  confidence: high
+- tool: get_open_orders
+  category: account
+  rest:
+  - getOrders
+  binding: name-semantic
+  confidence: high
+- tool: get_order_by_id
+  category: account
+  rest:
+  - getOrderById
+  binding: name-semantic
+  confidence: high
+- tool: get_trading_preferences
+  category: account
+  rest:
+  - getTradingPreferences
+  binding: name-semantic
+  confidence: high
+- tool: get_trading_stats
+  category: account
+  rest:
+  - getStat
+  binding: name-semantic
+  confidence: medium
+- tool: place_order
+  category: trading
+  rest:
+  - placeOrder
+  binding: name-semantic
+  confidence: high
+- tool: edit_order
+  category: trading
+  rest:
+  - editOrder
+  binding: name-semantic
+  confidence: high
+- tool: cancel_order
+  category: trading
+  rest:
+  - cancelOrder
+  binding: name-semantic
+  confidence: high
+- tool: cancel_all_orders
+  category: trading
+  rest:
+  - cancelAllOrders
+  binding: name-semantic
+  confidence: high
+- tool: place_batch_orders
+  category: trading
+  rest:
+  - batchCreate
+  binding: name-semantic
+  confidence: high
+- tool: edit_batch_orders
+  category: trading
+  rest:
+  - batchEdit
+  binding: name-semantic
+  confidence: high
+- tool: cancel_batch_orders
+  category: trading
+  rest:
+  - batchDelete
+  binding: name-semantic
+  confidence: high
+- tool: place_bracket_order
+  category: trading
+  rest:
+  - bracketOrder
+  binding: name-semantic
+  confidence: high
+- tool: edit_bracket_order
+  category: trading
+  rest:
+  - bracketOrder
+  binding: name-semantic
+  confidence: high
+- tool: set_product_leverage
+  category: trading
+  rest:
+  - changeOrderLeverage
+  binding: name-semantic
+  confidence: high
+- tool: adjust_position_margin
+  category: trading
+  rest:
+  - changePositionMargin
+  binding: name-semantic
+  confidence: high
+- tool: close_all_positions
+  category: trading
+  rest:
+  - closeAllPosition
+  binding: name-semantic
+  confidence: high
+- tool: configure_auto_topup
+  category: trading
+  rest:
+  - changeAutoTopup
+  binding: name-semantic
+  confidence: high
+mcp_only:
+- tool: get_mark_price_history
+  reason: 'mark price history served via /history/candles with MARK: symbols per docs; not a distinct operation in swagger_v2.json'
+- tool: get_oi_history
+  reason: no open-interest history operation in swagger_v2.json
+- tool: get_funding_history
+  reason: no funding history operation in swagger_v2.json
+- tool: get_settlement_prices
+  reason: settlement prices section in docs uses getProduct with states=expired; binding unverified
+- tool: get_reference_data
+  reason: composite/reference tool with no single REST operation
+- tool: setup_credentials
+  reason: local credential setup, no REST call
+- tool: get_connection_status
+  reason: local connectivity check
+rest_only:
+- SubaccountTransferHistory
+- assetTransfer
+- changeMarginMode
+- createHeartbeat
+- currentRateLimitQuota
+- downloadTransactions
+- getAssets
+- getHeartbeats
+- getOrderByCOI
+- getSparklines
+- getSubaccounts
+- resetMMP
+- sendHeartbeat
+- updateMMP
+- updateTradingPreferences
+coverage:
+  tools: 41
+  mapped: 34
+  mcp_only: 7
+  rest_operations: 48
+note: Bound by tool name and documented parameters against operationIds; the live server schema was not introspected.

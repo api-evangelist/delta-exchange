@@ -1,0 +1,16 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.delta.exchange/
+description: Delta Exchange India offers a Demo account backed by a testnet API; keys created in the Demo account work only against testnet.
+docs: https://docs.delta.exchange/
+environments:
+- name: production
+  rest: https://api.india.delta.exchange
+  websocket_private: wss://socket.india.delta.exchange
+  websocket_public: wss://public-socket.india.delta.exchange
+- name: testnet (Demo Account)
+  rest: https://cdn-ind.testnet.deltaex.org
+  websocket_private: wss://socket-ind.testnet.deltaex.org
+  websocket_public: wss://socket-ind-pub.testnet.deltaex.org
+key_formats:
+  note: API keys created at Demo account must be used only with testnet apis.

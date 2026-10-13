@@ -1,0 +1,21 @@
+# Delta Exchange MCP
+
+> Official Delta Exchange MCP server for AI clients: market data, account reads and trading. Market data needs no API key; account reads and trading need one, and its permission decides what the assistant can do.
+
+## Docs
+- [Quickstart](/docs): Install the Delta Exchange MCP server and connect your AI client in about two minutes. Market data works with no API key.
+- [What is MCP?](/docs/what-is-mcp): A plain-language explainer of the Model Context Protocol, how the Delta Exchange server fits the client → server → API chain, and why it suits trading.
+- [Use Cases](/docs/use-cases): Copy-paste prompts for the Delta Exchange MCP server. Paste any of these into Claude, Cursor, or Claude Code with the server installed.
+- [Authentication](/docs/authentication): Create an API key, configure environment variables, choose the Read Data or Trading permission, and understand which tools need credentials.
+- [Overview](/docs/tools): All Delta Exchange MCP tools, grouped by market data, account access, and trading.
+- [Market Data](/docs/tools/market-data): Public market-data tools for tickers, order book, candles, open interest, funding, options chain, and indices. No API key required.
+- [Account](/docs/tools/account): Account tools for positions, balances, fills, orders, and exports. A Read Data API key is required.
+- [Trading](/docs/tools/trading): Tools to place, edit, and cancel orders and manage brackets, leverage, margin, and positions. Registered with any API key; a Trading key is what lets them execute.
+- [Setup](/docs/tools/setup): The two tools the server always registers. setup_credentials opens a form for your API key; get_connection_status reports what it is using. Neither needs a key.
+- [Agent Context (for LLMs)](/docs/ai-context): A machine-readable primer on Delta Exchange products, symbols, expiries, funding, fees, and the data conventions of the MCP tools. For agents, not people.
+- [Security](/docs/security): How the Delta Exchange MCP server handles your credentials. Keys stay on your machine, the key's own permission decides what the assistant can do, local-only, and open source.
+- [Troubleshooting](/docs/troubleshooting): Common issues installing and running the Delta Exchange MCP server, and how to fix them.
+
+## For agents
+- [Agent Context (raw markdown)](/llms-context.md): domain primer on Delta products, symbols, expiries, contracts, funding, fees, and tool data conventions.
+- [Full docs as one file](/llms-full.txt): every page concatenated.

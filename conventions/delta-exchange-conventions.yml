@@ -1,0 +1,31 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.delta.exchange/
+authentication:
+  style: API key + HMAC signature + timestamp headers (api-key, signature, timestamp); signature older than 5 seconds is rejected (SignatureExpired)
+  docs: https://docs.delta.exchange/
+idempotency:
+  coverage: none
+  note: No idempotency-key mechanism is documented; orders accept a client_order_id and can be looked up by it (getOrderByCOI), but the docs do not state duplicate rejection.
+pagination:
+  style: cursor
+  params: [after, before, page_size]
+  response_fields: [meta.after, meta.before]
+error_envelope: '{ "success": false, "error": { "code": "..." } }'
+rate_limit_signaling:
+  status: 429
+  headers: [X-RATE-LIMIT-RESET]
+  quota_endpoint: currentRateLimitQuota
+versioning: URL path version /v2; v1 API documented as deprecated.
+reversibility:
+  surfaces:
+  - write: placeOrder / batchCreate / bracketOrder
+    reversal: cancelOrder, batchDelete, cancelAllOrders (open orders only; filled trades cannot be reversed)
+    window: null
+    grade: documented
+    docs: https://docs.delta.exchange/#delta-exchange-api-v2-orders
+  - write: changePositionMargin / changeOrderLeverage
+    reversal: same operation with opposite value
+    window: null
+    grade: documented
+  note: No reversal window is stated; a heartbeat (createHeartbeat) can cancel the user's open orders when it goes unhealthy.

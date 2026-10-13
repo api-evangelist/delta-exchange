@@ -1,0 +1,339 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-data-model.py
+source:
+- openapi/delta-exchange-openapi.yml
+notation: has_one = property $ref; has_many = array of $ref; belongs_to = <entity>_id field
+summary:
+  entities: 56
+  entities_in_spec: 56
+  relationships: 42
+entities:
+- name: ApiErrorResponse
+  fields: 2
+- name: ApiSuccessResponse
+  fields: 1
+- name: Asset
+  fields: 16
+  description: Details of the asset used in the product or contract.
+- name: AssetTransferSubaccountReq
+  fields: 4
+- name: BatchCreateOrder
+  fields: 8
+  description: A create order object
+- name: BatchCreateOrdersRequest
+  fields: 3
+- name: BatchDeleteOrder
+  fields: 2
+  description: A delete order object
+- name: BatchDeleteOrdersRequest
+  fields: 3
+- name: BatchEditOrder
+  fields: 5
+  description: edit order object
+- name: BatchEditOrdersRequest
+  fields: 3
+- name: CancelAllFilterObject
+  fields: 5
+  description: Cancel all request filter object
+- name: ChangeMarginModeRequest
+  fields: 2
+  description: Request to change the margin mode for a main or subaccount.
+- name: ChangeMarginModeResponse
+  fields: 2
+  description: Response returned after changing the user's margin mode
+- name: CreateBracketOrderRequest
+  fields: 5
+  description: bracket order object
+- name: CreateHeartbeat
+  fields: 6
+  description: Create Heartbeat Request Object
+- name: CreateOrderRequest
+  fields: 22
+  description: A create order object
+- name: DeleteOrderRequest
+  fields: 3
+  description: A delete order object
+- name: EditBracketOrderRequest
+  fields: 9
+  description: bracket order object
+- name: EditOrderRequest
+  fields: 9
+  description: edit order object
+- name: EditUserPreference
+  fields: 5
+  description: Edit User Preference Object
+- name: Fill
+  fields: 16
+  description: A fill object
+- name: FillMetaData
+  fields: 24
+  description: Meta data inside fill. Which fields are present varies by fill_type, confirmed across all 5 values.
+    normal and liquidation carry the full field set below, including ip/mark/spot/source and a fuller ne
+- name: Heartbeat
+  fields: 9
+  description: Heartbeat Object
+- name: HeartbeatAck
+  fields: 2
+  description: Heartbeat Acknowledgment Request Object
+- name: HeartbeatAckResponse
+  fields: 2
+  description: Heartbeat Acknowledgment Response Object
+- name: HeartbeatConfig
+  fields: 3
+  description: Heartbeat Configuration Object
+- name: HeartbeatResponse
+  fields: 2
+  description: Heartbeat Response Object
+- name: Index
+  fields: 14
+  description: Details of an index used in trading, including its constituents and characteristics.
+- name: L2Orderbook
+  fields: 4
+  description: L2 orderbook
+- name: MMPConfigUpdateRequest
+  fields: 7
+  description: MMP config for an underlying
+- name: MMPResetRequest
+  fields: 2
+  description: MMP config for an underlying
+- name: OHLCData
+  fields: 6
+  description: A ohlc object
+- name: Order
+  fields: 30
+  description: An Order object
+- name: OrderLeverage
+  fields: 3
+  description: Order Leverage for a product
+- name: PaginationMeta
+  fields: 2
+- name: Position
+  fields: 22
+  description: A position object
+- name: Product
+  fields: 46
+- name: ProductCategories
+  fields: 6
+  description: List of all the product category names on delta exchange. Please refer to this list while subscribing
+    to various public and private channels on delta exchange websocket
+- name: ProductSpecs
+  fields: 15
+  description: Specifications related to the specific product or contract. Which fields are present varies by contract_type
+    - options contracts carry the volatility-related fields, perpetuals carry funding-related f
+- name: RateLimitQuotaResponse
+  fields: 2
+- name: SparklineData
+  fields: 0
+- name: Stats
+  fields: 3
+- name: SubaccountTransferHistory
+  fields: 4
+- name: SubaccountTransferLog
+  fields: 7
+- name: Ticker
+  fields: 25
+  description: The 'Ticker' object provides real-time trading data for a specific product, including prices, volumes,
+    open interest, and Greek values (for options). This data is essential for analyzing market trends
+- name: Trades
+  fields: 1
+  description: trades of a symbol
+- name: Transaction
+  fields: 9
+- name: TransactionTypes
+  fields: 1
+- name: User
+  fields: 12
+  description: Represents a user account with personal and account-related details.
+- name: UserPreference
+  fields: 12
+  description: User trading preferences
+- name: Wallet
+  fields: 22
+  description: Wallet Data for each asset.
+- name: WalletMetaData
+  fields: 2
+  description: Meta data for robo trading
+- name: WalletPayload
+  fields: 3
+- name: greeks
+  fields: 5
+  description: The Greeks represent different factors that influence the pricing of options. These are key measures
+    for assessing risk and managing option positions.
+- name: price_band
+  fields: 2
+  description: The price band defines the permissible price range for a product. The lower and upper limits represent
+    the boundaries within which the product's price can fluctuate.
+- name: quotes
+  fields: 6
+  description: The 'quotes' object contains the latest bid and ask prices, their respective implied volatilities
+    (IV), and order sizes for an asset. It provides key market data for understanding liquidity and pricin
+relationships:
+- from: Product
+  to: ProductSpecs
+  type: has_one
+  via: product_specs
+- from: Product
+  to: Asset
+  type: has_one
+  via: underlying_asset
+- from: Product
+  to: Asset
+  type: has_one
+  via: quoting_asset
+- from: Product
+  to: Asset
+  type: has_one
+  via: settling_asset
+- from: Product
+  to: Index
+  type: has_one
+  via: spot_index
+- from: Order
+  to: User
+  type: belongs_to
+  via: user_id
+- from: Order
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: CreateOrderRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: BatchCreateOrdersRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: BatchCreateOrdersRequest
+  to: BatchCreateOrder
+  type: has_many
+  via: orders
+- from: EditOrderRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: BatchEditOrdersRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: BatchEditOrdersRequest
+  to: BatchEditOrder
+  type: has_many
+  via: orders
+- from: CreateBracketOrderRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: EditBracketOrderRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: DeleteOrderRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: CancelAllFilterObject
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: BatchDeleteOrdersRequest
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: BatchDeleteOrdersRequest
+  to: BatchDeleteOrder
+  type: has_many
+  via: orders
+- from: Position
+  to: User
+  type: belongs_to
+  via: user_id
+- from: Position
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: Position
+  to: Product
+  type: has_one
+  via: product
+- from: Fill
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: Fill
+  to: Order
+  type: belongs_to
+  via: order_id
+- from: Fill
+  to: FillMetaData
+  type: has_one
+  via: meta_data
+- from: OrderLeverage
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: Wallet
+  to: Asset
+  type: belongs_to
+  via: asset_id
+- from: Wallet
+  to: User
+  type: belongs_to
+  via: user_id
+- from: WalletPayload
+  to: WalletMetaData
+  type: has_one
+  via: meta
+- from: Transaction
+  to: TransactionTypes
+  type: has_one
+  via: transaction_type
+- from: Transaction
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: Transaction
+  to: Asset
+  type: belongs_to
+  via: asset_id
+- from: Ticker
+  to: greeks
+  type: has_one
+  via: greeks
+- from: Ticker
+  to: price_band
+  type: has_one
+  via: price_band
+- from: Ticker
+  to: Product
+  type: belongs_to
+  via: product_id
+- from: Ticker
+  to: quotes
+  type: has_one
+  via: quotes
+- from: UserPreference
+  to: User
+  type: belongs_to
+  via: user_id
+- from: CreateHeartbeat
+  to: Heartbeat
+  type: belongs_to
+  via: heartbeat_id
+- from: CreateHeartbeat
+  to: HeartbeatConfig
+  type: has_many
+  via: config
+- from: HeartbeatResponse
+  to: Heartbeat
+  type: belongs_to
+  via: heartbeat_id
+- from: HeartbeatAck
+  to: Heartbeat
+  type: belongs_to
+  via: heartbeat_id
+- from: Heartbeat
+  to: HeartbeatConfig
+  type: has_many
+  via: config

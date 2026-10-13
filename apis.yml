@@ -1,23 +1,165 @@
 aid: delta-exchange
+
 name: Delta Exchange
-description: 'Delta Exchange is a company surfaced via the API Evangelist harvest backlog (source: market-gap:crypto-exchanges)
-  and added to the network as a stub for full-pipeline profiling.'
+
+image: https://static.delta.exchange/seo/india/delta_twitter_og_img.jpg
+
+description: Delta Exchange is a derivatives-focused crypto exchange; Delta Exchange India (operated by Excelium Technologies
+  Private Limited, FIU-registered) offers INR-settled perpetual futures, BTC and ETH call and put options and spot markets.
+  It publishes a Swagger 2.0 REST API v2 (api.india.delta.exchange), WebSocket market and account feeds, a demo/testnet
+  environment, official Python and Node REST clients, and an official local MCP server (delta-exchange-mcp on PyPI).
+
 url: https://raw.githubusercontent.com/api-evangelist/delta-exchange/refs/heads/main/apis.yml
+
 x-type: company
+
 x-source: harvest:market-gap:crypto-exchanges
-x-tier: stub
-x-tier-reason: harvest
+
+x-tier: profiled
+
+x-tier-reason: enrichment pass 2026-10-13 (local-v5; was harvest)
+
 specificationVersion: '0.20'
+
 created: '2026-10-13'
+
 modified: '2026-10-13'
+
 tags:
 - Company
-apis: []
+- Cryptocurrency
+- Crypto Exchanges
+- Derivatives
+- Trading
+- Options
+- Futures
+- Market Data
+
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+
 common:
+- type: AgentSkill
+  url: skills/_index.yml
+- type: SecurityTxt
+  url: well-known/delta-exchange-status-security.txt
+- type: AgenticAccess
+  url: agentic-access/delta-exchange-agentic-access.yml
+- type: RateLimits
+  url: rate-limits/delta-exchange-rate-limits.yml
+- type: Spectral
+  url: rules/delta-exchange-rules.yml
+- type: Vocabulary
+  url: vocabulary/delta-exchange-vocabulary.yml
+- type: DataModel
+  url: data-model/delta-exchange-data-model.yml
+- type: Conventions
+  url: conventions/delta-exchange-conventions.yml
+- type: Sandbox
+  url: sandbox/delta-exchange-sandbox.yml
+- type: Security
+  url: security/delta-exchange-vulnerability-disclosure.yml
+- type: VulnerabilityDisclosure
+  url: security/delta-exchange-vulnerability-disclosure.yml
+- type: Deprecation
+  url: lifecycle/delta-exchange-lifecycle.yml
+- type: StatusPage
+  url: https://status.delta.exchange/
+- type: Lifecycle
+  url: lifecycle/delta-exchange-lifecycle.yml
+- type: ErrorCatalog
+  url: errors/delta-exchange-problem-types.yml
+- type: Conformance
+  url: conformance/delta-exchange-conformance.yml
+- type: LLMsTxt
+  url: llms/delta-exchange-llms.txt
+- type: ToolCrosswalk
+  url: mcp/delta-exchange-tool-crosswalk.yml
+- type: MCPServer
+  url: mcp/delta-exchange-mcp.yml
+- type: WellKnown
+  url: well-known/delta-exchange-well-known.yml
+- type: Hosts
+  url: hosts/delta-exchange-hosts.yml
+- type: IntegrationEdges
+  url: integrations/delta-exchange-integration-edges.yml
+- type: Vendors
+  url: vendors/delta-exchange-vendors.yml
+- type: SDKs
+  url: packages/delta-exchange-packages.yml
+- type: Packages
+  url: packages/delta-exchange-packages.yml
+- type: Authentication
+  url: authentication/delta-exchange-authentication.yml
+- type: DomainSecurity
+  url: security/delta-exchange-domain-security.yml
 - type: Website
   url: https://www.delta.exchange
+- type: Documentation
+  url: https://docs.delta.exchange/
+- type: Blog
+  url: https://www.delta.exchange/blog
+- type: Login
+  url: https://www.delta.exchange/app/login
+- type: Newsroom
+  url: https://www.delta.exchange/press
+- type: Support
+  url: https://www.delta.exchange/support
+- type: TermsOfService
+  url: https://www.delta.exchange/terms-of-use
+- type: PrivacyPolicy
+  url: https://www.delta.exchange/privacy-policy
+- type: GitHubOrganization
+  url: https://github.com/delta-exchange
+- type: Pricing
+  url: https://www.delta.exchange/fees
+- type: DeveloperPortal
+  url: https://www.delta.exchange/algo/delta-exchange-apis
+- type: LinkedIn
+  url: https://www.linkedin.com/company/delta-exchange/
+- type: X
+  url: https://x.com/Delta_Exchange
+
+apis:
+- aid: delta-exchange:delta-exchange-rest-api-v2
+  name: Delta Exchange India REST API v2
+  description: REST API for Delta Exchange India covering assets, indices, products, tickers, option chains, orders (single,
+    bracket, batch), a heartbeat-based dead man's switch, positions and margin, fills, wallet balances and transactions,
+    sub-account transfers, OHLC candles, market maker protection, trading preferences and rate-limit quota. Private endpoints
+    are signed with an API key, HMAC signature and timestamp.
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Trading
+  - Derivatives
+  - Market Data
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-openapi.yml
+  - type: OpenAPI
+    name: OpenAPI (provider-hosted)
+    url: https://docs.delta.exchange/api/swagger_v2.json
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-mcp
+  name: Delta Exchange MCP Server
+  description: Official Delta Exchange MCP server (Python, published on PyPI as delta-exchange-mcp and run locally with
+    uvx) exposing market data, account and trading tools over the Delta Exchange India API; market data needs no API key.
+  humanURL: https://mcp.delta.exchange/
+  baseURL: https://api.india.delta.exchange
+  tags:
+  - MCP
+  - Agents
+  properties:
+  - type: Documentation
+    url: https://mcp.delta.exchange/docs
+  - type: SourceCode
+    url: https://github.com/delta-exchange/delta-exchange-mcp
+x-enrichment:
+  date: '2026-10-13'
+  status: enriched
+  artifacts_added: 14
+  pass: local-v5

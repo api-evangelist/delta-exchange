@@ -1,0 +1,98 @@
+generated: '2026-10-13'
+method: derived
+generator: derive-vocabulary.py
+source: openapi/delta-exchange-openapi.yml
+vocabulary:
+  name: Delta Exchange Domain Vocabulary
+  description: 'Terms declared by Delta Exchange''s own API contract: its resource groups, objects and enumerations, with the contract''s definitions.
+    Derived, not authored.'
+  version: '2026-10-13'
+  terms:
+  - term: Assets
+    definition: Get Asset List
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Indices
+    definition: Get Indices List
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Products
+    definition: Get Product List
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Orders
+    definition: Placing Orders, Cancelling Orders, Placing batch orders, Cancelling batch orders, Get Open orders, Change Orders Leverage. Rate
+      limits have been introduced recently that allows only set number of operations inside a matching engine in a timeframe. The current rate
+      limits is 500 operations/sec for each product. For ex - placing 50 orders in a batch is equivalent to 50 operations as these orders wil
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Positions
+    definition: Get Open positions, Change Position Margin, Close Position, Close All Position
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: TradeHistory
+    definition: Get Orders History, Get Fill History
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Orderbook
+    definition: L2Orderbook
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Trades
+    definition: Get Trades of a contract
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Wallet
+    definition: Get balances, Get transaction history
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: OHLC Candles
+    definition: Get price data
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Stats
+    definition: Get Volume Stats
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: MMP
+    definition: Market maker protection
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Dead Man's Switch (Auto Cancel)
+    definition: Set up timers for auto orders cancel in case of network malfunctions
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Account
+    definition: Account level settings
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Heartbeat Management
+    definition: 'Resource group in the contract; its operation POST /heartbeat/create: Create Heartbeat'
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Settlement Prices
+    definition: 'Resource group in the contract; its operation GET /products/?states=expired: Get product settlement prices'
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml
+  - term: Historical OHLC Candles/Sparklines
+    definition: 'Resource group in the contract; its operation GET /history/candles: It returns historical Open-High-Low-Close(ohlc) candles data
+      of the symbol as per input values for resolution, start time and end time.'
+    tags:
+    - Resource Group
+    source: openapi/delta-exchange-openapi.yml

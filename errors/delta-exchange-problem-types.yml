@@ -1,0 +1,17 @@
+generated: '2026-10-13'
+method: searched
+source: https://docs.delta.exchange/
+format: custom-json
+envelope: '{ "success": false, "error": { "code": "invalid_api_key" } }'
+problems:
+- {status: 400, title: Bad Request, description: Bad Request -- Your request is invalid.}
+- {status: 401, title: Unauthorized, description: Unauthorized -- Your API key/Signature is wrong.}
+- {status: 401, title: invalid_api_key, type: invalid_api_key, description: "The API key in your request doesn't exist or is invalid.", remediation: Confirm the key still exists and is used against the matching environment (India production vs Demo testnet).}
+- {status: 401, title: SignatureExpired, type: SignatureExpired, description: The timestamp used to generate the request signature is more than 5 seconds old by the time it reaches Delta Exchange servers., remediation: Sync the system clock with NTP and check network latency.}
+- {status: 403, title: Forbidden, description: "Forbidden Error -- Request blocked by CDN (e.g., missing User-Agent header or hidden/blocked IP from certain hosted environments)."}
+- {status: 404, title: Not Found, description: Not Found -- The specified resource could not be found.}
+- {status: 405, title: Method Not Allowed, description: Method Not Allowed -- You tried to access a resource with an invalid method.}
+- {status: 406, title: Not Acceptable, description: "Not Acceptable -- You requested a format that isn't json."}
+- {status: 429, title: Too Many Requests, description: Too Many Requests -- You have exhausted your rate limits! Slow down!}
+- {status: 500, title: Internal Server Error, description: Internal Server Error -- We had a problem with our server. Try again later.}
+- {status: 503, title: Service Unavailable, description: "Service Unavailable -- We're temporarily offline for maintenance. Please try again later."}

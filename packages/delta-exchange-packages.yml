@@ -1,0 +1,29 @@
+generated: '2026-10-13'
+method: searched
+source: https://github.com/delta-exchange
+packages:
+- name: delta-rest-client
+  registry: pypi
+  url: https://pypi.org/project/delta-rest-client/
+  language: Python
+  official: true
+  version: 1.0.14
+  published: '2026-04-23'
+  repository: https://github.com/delta-exchange/python-rest-client
+- name: delta-rest-client
+  registry: npm
+  url: https://www.npmjs.com/package/delta-rest-client
+  language: JavaScript
+  official: true
+  version: 1.0.0
+  published: '2020-07-09'
+  repository: https://github.com/delta-exchange/node-client
+  note: npm maintainer saurabh.goyal@delta.exchange; package.json in github.com/delta-exchange/node-client names it.
+- name: delta-exchange-mcp
+  registry: pypi
+  url: https://pypi.org/project/delta-exchange-mcp/
+  language: Python
+  official: true
+  version: 0.7.0
+  published: '2026-09-22'
+  repository: https://github.com/delta-exchange/delta-exchange-mcp
