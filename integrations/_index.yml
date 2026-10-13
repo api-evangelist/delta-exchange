@@ -11,3 +11,24 @@
   source: edge
   status: pending-partner-spec
   arazzo: null
+- slug: delta-exchange-ccxt
+  label: CCXT
+  partner_name: CCXT
+  type: coverage
+  channel: open-source-node
+  evidence: https://github.com/ccxt/ccxt/blob/master/ts/src/delta.ts
+  source: edge
+  relationship: connector-coverage
+  status: not-a-workflow
+  arazzo: null
+- slug: delta-exchange-coingecko
+  label: CoinGecko
+  partner: coingecko
+  partner_name: CoinGecko
+  type: coverage
+  channel: partner-built
+  evidence: https://api.coingecko.com/api/v3/exchanges/delta_spot
+  source: edge
+  relationship: connector-coverage
+  status: not-a-workflow
+  arazzo: null

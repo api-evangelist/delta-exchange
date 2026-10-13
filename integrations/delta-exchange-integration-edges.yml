@@ -6,10 +6,12 @@ source:
 - https://composio.dev/toolkits/delta-exchange
 - https://monid.ai/tools/delta-exchange
 checked:
+- https://api.coingecko.com/api/v3/exchanges
 - https://composio.dev/toolkits/delta-exchange
 - https://github.com/delta-exchange
 - https://monid.ai/tools/delta-exchange
 - https://n8n.io/integrations/delta-exchange/
+- https://raw.githubusercontent.com/ccxt/ccxt/master/exchanges.json
 - https://www.delta.exchange/fees
 - https://zapier.com/apps/delta-exchange/integrations
 summary: null
@@ -20,4 +22,32 @@ edges:
   type: claimed
   evidence: https://www.delta.exchange/fees
   note: 'Site navigation: "Trading Bot Automate Bots from TradingView" and footer "TradingView".'
+- partner_name: CCXT
+  partner: null
+  partner_match: null
+  type: coverage
+  channel: open-source-node
+  relationship: connector-coverage
+  direction: partner-built
+  evidence: https://github.com/ccxt/ccxt/blob/master/ts/src/delta.ts
+  ccxt_id: delta
+  ccxt_certified: null
+  ccxt_pro: null
+  matched_by: domain:delta.exchange
+  partner_gap: no ccxt repo in all/* (catalog gap)
+  detected_by: sweep-crypto.py
+  first_seen: '2026-10-13'
+- partner_name: CoinGecko
+  partner: coingecko
+  partner_match: aggregator
+  channel: partner-built
+  direction: partner-built
+  type: coverage
+  relationship: connector-coverage
+  evidence: https://api.coingecko.com/api/v3/exchanges/delta_spot
+  matched_by: domain:delta.exchange
+  coingecko_id: delta_spot
+  trust_score: 4
+  detected_by: sweep-crypto.py
+  first_seen: '2026-10-13'
 templates: []
