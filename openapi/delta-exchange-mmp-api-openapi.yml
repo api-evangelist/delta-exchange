@@ -1,0 +1,266 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange MMP API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged MMP across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: MMP
+  description: Market maker protection
+paths:
+  /users/update_mmp:
+    put:
+      tags:
+      - MMP
+      summary: Update MMP config
+      operationId: updateMMP
+      description: Channel provides updates when MMP is triggered. Market maker protection is available to registered market makers by default.
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Returns back the User Preference which contains mmp config
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/UserPreference'
+        '400':
+          description: Returns error if mmp is not enabled on the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMPConfigUpdateRequest'
+        description: mmp config for a given underlying asset
+        required: true
+    servers:
+    - url: https://api.india.delta.exchange/v2
+  /users/reset_mmp:
+    put:
+      tags:
+      - MMP
+      summary: Reset MMP
+      operationId: resetMMP
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Returns back the User Preference which contains mmp config
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiSuccessResponse'
+        '400':
+          description: Returns error if mmp is not enabled on the account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MMPResetRequest'
+        description: reset mmp config for a given underlying asset
+        required: true
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    MMPConfigUpdateRequest:
+      type: object
+      description: MMP config for an underlying
+      properties:
+        asset:
+          type: string
+          required: true
+        window_interval:
+          type: integer
+          description: Window interval in seconds
+        freeze_interval:
+          type: integer
+          description: MMP freeze interval in seconds. Setting this to zero will require a manual reset once mmp is triggered.
+        trade_limit:
+          type: string
+          description: Notional trade limit for mmp to trigger (in USD)
+        delta_limit:
+          type: string
+          description: Delta Adjusted notional trade limit for mmp to trigger (in USD)
+        vega_limit:
+          type: string
+          description: vega traded limit for mmp to trigger (in USD)
+        mmp:
+          type: string
+          description: Specify mmp flag for the config update
+          enum:
+          - mmp1
+          - mmp2
+          - mmp3
+          - mmp4
+          - mmp5
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    ApiErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: object
+    MMPResetRequest:
+      type: object
+      description: MMP config for an underlying
+      properties:
+        asset:
+          type: string
+          required: true
+        mmp:
+          type: string
+          description: specify mmp flag to reset
+          enum:
+          - mmp1
+          - mmp2
+          - mmp3
+          - mmp4
+          - mmp5
+    UserPreference:
+      type: object
+      description: User trading preferences
+      properties:
+        user_id:
+          type: integer
+          example: 57354187
+          description: Unique identifier for the user
+        default_auto_topup:
+          type: boolean
+          example: true
+          description: Default auto top-up setting for newly acquired positions (only for isolated mode)
+        mmp_config:
+          type:
+          - object
+          - 'null'
+          example: null
+          description: Config object for market maker protection (only for MMP-enabled accounts)
+        deto_for_commission:
+          type: boolean
+          example: false
+          description: Flag to determine whether to pay commissions in DETO
+        vip_level:
+          type: integer
+          example: 0
+          description: VIP level for this account. Customers get better fee discounting for higher VIP levels
+        vip_discount_factor:
+          type: string
+          example: '0.00'
+          description: Discount factor based on the VIP level
+        volume_30d:
+          type: string
+          example: '1060.675333'
+          description: 30-day trading volume for the user
+        email_preferences:
+          type: object
+          description: Email preferences for different events
+          properties:
+            adl:
+              type: boolean
+              example: true
+            liquidation:
+              type: boolean
+              example: true
+            margin_topup:
+              type: boolean
+              example: false
+            marketing:
+              type: boolean
+              example: true
+            order_cancel:
+              type: boolean
+              example: true
+            order_fill:
+              type: boolean
+              example: true
+            stop_order_trigger:
+              type: boolean
+              example: true
+        notification_preferences:
+          type: object
+          description: Notification preferences for different events
+          properties:
+            adl:
+              type: boolean
+              example: true
+            liquidation:
+              type: boolean
+              example: true
+            margin_topup:
+              type: boolean
+              example: false
+            marketing:
+              type: boolean
+              example: true
+            order_cancel:
+              type: boolean
+              example: false
+            order_fill:
+              type: boolean
+              example: true
+            price_alert:
+              type: boolean
+              example: true
+            stop_order_trigger:
+              type: boolean
+              example: true
+        price_alert_assets:
+          type: array
+          items:
+            type: string
+          example:
+          - BTC
+          - ETH
+          description: Assets for which price alerts are set
+        enabled_portfolios:
+          type: object
+          example: {}
+          description: Enabled portfolios for the user
+        interest_credit:
+          type: boolean
+          example: false
+          description: Whether the user is receiving interest credits
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

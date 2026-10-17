@@ -1,0 +1,70 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Stats API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Stats across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Stats
+  description: Get Volume Stats
+paths:
+  /stats:
+    get:
+      tags:
+      - Stats
+      summary: Get volume stats
+      operationId: getStat
+      responses:
+        '200':
+          description: sum of turnover in the last 7 and 30 days along with  Total Volume in the last 24 hours (in USD)
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/Stats'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    Stats:
+      type: object
+      properties:
+        last_30_days_volume:
+          type: integer
+          description: sum of turnover usd in the last 30 days
+        last_7_days_volume:
+          type: integer
+          description: sum of turnover usd in the last 7 days
+        total_volume:
+          type: integer
+          description: sum of turnover usd in the last 24 hours
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

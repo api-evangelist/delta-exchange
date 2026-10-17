@@ -1,0 +1,87 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Trades API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Trades across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Trades
+  description: Get Trades of a contract
+paths:
+  /trades/{symbol}:
+    get:
+      tags:
+      - Trades
+      operationId: getTrades
+      summary: Get public trades
+      parameters:
+      - in: path
+        name: symbol
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of recent trades of the product
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/Trades'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    Trades:
+      type: object
+      description: trades of a symbol
+      properties:
+        trades:
+          type: array
+          items:
+            type: object
+            properties:
+              side:
+                type: string
+                enum:
+                - buy
+                - sell
+                x-enumDescriptions:
+                  buy: Trade where the aggressor was a buyer
+                  sell: Trade where the aggressor was a seller
+              size:
+                type: integer
+              price:
+                type: string
+              timestamp:
+                type: integer
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

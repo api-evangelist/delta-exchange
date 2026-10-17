@@ -1,0 +1,436 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Account API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Account across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Account
+  description: Account level settings
+paths:
+  /users/trading_preferences:
+    get:
+      tags:
+      - Account
+      summary: Get users trading preferences
+      operationId: getTradingPreferences
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: User trading preferences attached to the account
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/UserPreference'
+    put:
+      tags:
+      - Account
+      summary: Update users trading preferences
+      operationId: updateTradingPreferences
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: User trading preferences attached to the account
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/UserPreference'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditUserPreference'
+        description: trading preferences
+        required: true
+    servers:
+    - url: https://api.india.delta.exchange/v2
+  /sub_accounts:
+    get:
+      tags:
+      - Account
+      summary: Get subaccounts
+      description: This api returns all the subaccounts belonging to the same parent/main user. Make sure to call this api from the parent user.
+      operationId: getSubaccounts
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Subaccounts belonging to the same parent account.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/ArrayOfSubaccouns'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+  /users/margin_mode:
+    put:
+      tags:
+      - Account
+      summary: Change margin mode
+      operationId: changeMarginMode
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Returns the [ChangeMarginModeResponse](#tocSchangemarginmoderesponse) with the updated margin mode
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/ChangeMarginModeResponse'
+        '400':
+          description: Returns error if margin mode could not be changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeMarginModeRequest'
+        description: changes margin mode of the user
+        required: true
+    servers:
+    - url: https://api.india.delta.exchange/v2
+  /rate_limits/quota:
+    get:
+      tags:
+      - Account
+      summary: Get current rate limit quota
+      operationId: currentRateLimitQuota
+      responses:
+        '200':
+          description: This api returns the current rate limit quota.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RateLimitQuotaResponse'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    ChangeMarginModeRequest:
+      type: object
+      description: Request to change the margin mode for a main or subaccount.
+      properties:
+        margin_mode:
+          type: string
+          description: 'The target margin mode: ''isolated'' or ''portfolio''.'
+          enum:
+          - isolated
+          - portfolio
+          x-enumDescriptions:
+            isolated: Margin is allocated per position; loss on one position cannot draw from others
+            portfolio: Portfolio margin is shared across positions to net out risk
+          required: true
+          example: isolated
+        subaccount_user_id:
+          type: string
+          description: The user ID of the account. Provide the main user ID for the main account or the respective subaccount user ID.
+          required: true
+          example: '5112346'
+    ApiErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: object
+    EditUserPreference:
+      type: object
+      description: Edit User Preference Object
+      properties:
+        default_auto_topup:
+          type: boolean
+          example: true
+          description: Default auto top-up setting for newly acquired positions
+        showMarketOrdersForOptionsInBracket:
+          type: boolean
+          example: true
+          description: Flag to display market orders for options in bracket orders
+        interest_credit:
+          type: boolean
+          example: false
+          description: Whether the user is receiving interest credits
+        email_preferences:
+          type: object
+          description: Email preferences for different events
+          properties:
+            adl:
+              type: boolean
+              example: true
+            liquidation:
+              type: boolean
+              example: true
+            order_fill:
+              type: boolean
+              example: true
+            stop_order_trigger:
+              type: boolean
+              example: true
+            order_cancel:
+              type: boolean
+              example: true
+            marketing:
+              type: boolean
+              example: true
+        notification_preferences:
+          type: object
+          description: Notification preferences for different events
+          properties:
+            adl:
+              type: boolean
+              example: false
+            liquidation:
+              type: boolean
+              example: true
+            order_fill:
+              type: boolean
+              example: true
+            stop_order_trigger:
+              type: boolean
+              example: true
+            price_alert:
+              type: boolean
+              example: true
+            marketing:
+              type: boolean
+              example: true
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    User:
+      type: object
+      description: Represents a user account with personal and account-related details.
+      properties:
+        id:
+          type: string
+          description: Unique user identifier, which can be an integer or string.
+          example: '98765432'
+        email:
+          type: string
+          description: User's email address.
+          example: rajtrader2342@gmail.com
+        account_name:
+          type: string
+          description: The main account or subaccount name.
+          example: Main
+        first_name:
+          type: string
+          description: User's first name.
+          example: Rajesh
+        last_name:
+          type: string
+          description: User's last name.
+          example: Sharma
+        dob:
+          type: string
+          format: date
+          description: Date of birth in YYYY-MM-DD format.
+          example: '1985-08-25'
+        country:
+          type: string
+          description: User's country of residence.
+          example: India
+        phone_number:
+          type: string
+          description: User's phone number with country code.
+          example: '9876543210'
+        margin_mode:
+          type: string
+          description: The user's margin mode, which can be 'isolated' or 'portfolio'.
+          example: isolated
+        pf_index_symbol:
+          type: string
+          description: Portfolio index symbol if the account is in portfolio margin mode.
+          example: .DEXBTUSD
+        is_sub_account:
+          type: boolean
+          description: Indicates if the user account is a sub-account.
+          example: false
+        is_kyc_done:
+          type: boolean
+          description: Indicates if the user's KYC verification is completed.
+          example: true
+    ArrayOfSubaccouns:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    ChangeMarginModeResponse:
+      type: object
+      description: Response returned after changing the user's margin mode
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the user(user_id) whose margin mode was updated
+          example: '5112346'
+        margin_mode:
+          type: string
+          description: 'The updated margin mode. Possible values: isolated, portfolio, or cross'
+          example: isolated
+    UserPreference:
+      type: object
+      description: User trading preferences
+      properties:
+        user_id:
+          type: integer
+          example: 57354187
+          description: Unique identifier for the user
+        default_auto_topup:
+          type: boolean
+          example: true
+          description: Default auto top-up setting for newly acquired positions (only for isolated mode)
+        mmp_config:
+          type:
+          - object
+          - 'null'
+          example: null
+          description: Config object for market maker protection (only for MMP-enabled accounts)
+        deto_for_commission:
+          type: boolean
+          example: false
+          description: Flag to determine whether to pay commissions in DETO
+        vip_level:
+          type: integer
+          example: 0
+          description: VIP level for this account. Customers get better fee discounting for higher VIP levels
+        vip_discount_factor:
+          type: string
+          example: '0.00'
+          description: Discount factor based on the VIP level
+        volume_30d:
+          type: string
+          example: '1060.675333'
+          description: 30-day trading volume for the user
+        email_preferences:
+          type: object
+          description: Email preferences for different events
+          properties:
+            adl:
+              type: boolean
+              example: true
+            liquidation:
+              type: boolean
+              example: true
+            margin_topup:
+              type: boolean
+              example: false
+            marketing:
+              type: boolean
+              example: true
+            order_cancel:
+              type: boolean
+              example: true
+            order_fill:
+              type: boolean
+              example: true
+            stop_order_trigger:
+              type: boolean
+              example: true
+        notification_preferences:
+          type: object
+          description: Notification preferences for different events
+          properties:
+            adl:
+              type: boolean
+              example: true
+            liquidation:
+              type: boolean
+              example: true
+            margin_topup:
+              type: boolean
+              example: false
+            marketing:
+              type: boolean
+              example: true
+            order_cancel:
+              type: boolean
+              example: false
+            order_fill:
+              type: boolean
+              example: true
+            price_alert:
+              type: boolean
+              example: true
+            stop_order_trigger:
+              type: boolean
+              example: true
+        price_alert_assets:
+          type: array
+          items:
+            type: string
+          example:
+          - BTC
+          - ETH
+          description: Assets for which price alerts are set
+        enabled_portfolios:
+          type: object
+          example: {}
+          description: Enabled portfolios for the user
+        interest_credit:
+          type: boolean
+          example: false
+          description: Whether the user is receiving interest credits
+    RateLimitQuotaResponse:
+      type: object
+      properties:
+        current_quota:
+          type: integer
+          example: 42
+        remaining_time_in_milliseconds:
+          type: integer
+          example: 120632
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

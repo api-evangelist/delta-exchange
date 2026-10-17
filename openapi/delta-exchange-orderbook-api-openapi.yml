@@ -1,0 +1,114 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Orderbook API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Orderbook across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Orderbook
+  description: L2Orderbook
+paths:
+  /l2orderbook/{symbol}:
+    get:
+      tags:
+      - Orderbook
+      operationId: getL2Orderbook
+      summary: Get L2 orderbook
+      parameters:
+      - in: path
+        name: symbol
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: depth
+        description: number of levels on each side
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: L2 orderbook for the product
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/L2Orderbook'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    L2Orderbook:
+      type: object
+      description: L2 orderbook
+      properties:
+        buy:
+          type: array
+          items:
+            type: object
+            properties:
+              depth:
+                type: string
+                description: sum of size till that price level
+              price:
+                type: string
+              size:
+                type: integer
+                description: for derivatives -> number of contracts, for spot -> amount in underlying
+        last_updated_at:
+          type: integer
+        sell:
+          type: array
+          items:
+            type: object
+            properties:
+              depth:
+                type: string
+                description: sum of size till that price level
+              price:
+                type: string
+              size:
+                type: integer
+                description: for derivatives -> number of contracts, for spot -> amount in underlying
+        symbol:
+          type: string
+      example:
+        buy:
+        - depth: '983'
+          price: '9187.5'
+          size: 205640
+        last_updated_at: 1654589595784000
+        sell:
+        - depth: '1185'
+          price: '9188.0'
+          size: 113752
+        symbol: BTCUSD
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

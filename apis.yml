@@ -124,30 +124,12 @@ common:
   url: https://x.com/Delta_Exchange
 
 apis:
-- aid: delta-exchange:delta-exchange-rest-api-v2
-  name: Delta Exchange India REST API v2
-  description: REST API for Delta Exchange India covering assets, indices, products, tickers, option chains, orders (single,
-    bracket, batch), a heartbeat-based dead man's switch, positions and margin, fills, wallet balances and transactions,
-    sub-account transfers, OHLC candles, market maker protection, trading preferences and rate-limit quota. Private endpoints
-    are signed with an API key, HMAC signature and timestamp.
-  humanURL: https://docs.delta.exchange/
-  baseURL: https://api.india.delta.exchange/v2
-  tags:
-  - Trading
-  - Derivatives
-  - Market Data
-  properties:
-  - type: OpenAPI
-    url: openapi/delta-exchange-openapi.yml
-  - type: OpenAPI
-    name: OpenAPI (provider-hosted)
-    url: https://docs.delta.exchange/api/swagger_v2.json
-  - type: Documentation
-    url: https://docs.delta.exchange/
 - aid: delta-exchange:delta-exchange-mcp
   name: Delta Exchange MCP Server
-  description: Official Delta Exchange MCP server (Python, published on PyPI as delta-exchange-mcp and run locally with
-    uvx) exposing market data, account and trading tools over the Delta Exchange India API; market data needs no API key.
+  description: >-
+    Official Delta Exchange MCP server (Python, published on PyPI as delta-exchange-mcp and run locally
+    with uvx) exposing market data, account and trading tools over the Delta Exchange India API; market
+    data needs no API key.
   humanURL: https://mcp.delta.exchange/
   baseURL: https://api.india.delta.exchange
   tags:
@@ -158,6 +140,194 @@ apis:
     url: https://mcp.delta.exchange/docs
   - type: SourceCode
     url: https://github.com/delta-exchange/delta-exchange-mcp
+- aid: delta-exchange:delta-exchange-account-api
+  name: Delta Exchange Account API
+  description: Account level settings
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Account
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-account-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-assets-api
+  name: Delta Exchange Assets API
+  description: Get Asset List
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Assets
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-assets-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-heartbeat-management-api
+  name: Delta Exchange Heartbeat Management API
+  description: >-
+    The Heartbeat Management API from Delta Exchange — 2 operation(s) for heartbeat management.
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Heartbeat Management
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-heartbeat-management-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-historical-ohlc-candles-sparklines-api
+  name: Delta Exchange Historical OHLC Candles/Sparklines API
+  description: >-
+    The Historical OHLC Candles/Sparklines API from Delta Exchange — 2 operation(s) for historical ohlc
+    candles/sparklines.
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Historical OHLC Candles/Sparklines
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-historical-ohlc-candles-sparklines-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-indices-api
+  name: Delta Exchange Indices API
+  description: Get Indices List
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Indices
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-indices-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-mmp-api
+  name: Delta Exchange MMP API
+  description: Market maker protection
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - MMP
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-mmp-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-orderbook-api
+  name: Delta Exchange Orderbook API
+  description: L2Orderbook
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Orderbook
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-orderbook-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-orders-api
+  name: Delta Exchange Orders API
+  description: >-
+    Placing Orders, Cancelling Orders, Placing batch orders, Cancelling batch orders, Get Open orders,
+    Change Orders Leverage. Rate limits have been introduced recently that allows only set number of operations
+    inside a matching engine in a timeframe. The current rate limits is 500 operations/sec for each product.
+    For ex - placing 50 orders in a batch is equivalent to 50 operations as these orders will be processed
+    by matching engine. Rate limits do not apply when cancelling orders.
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Orders
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-orders-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-positions-api
+  name: Delta Exchange Positions API
+  description: Get Open positions, Change Position Margin, Close Position, Close All Position
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Positions
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-positions-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-products-api
+  name: Delta Exchange Products API
+  description: Get Product List
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Products
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-products-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-settlement-prices-api
+  name: Delta Exchange Settlement Prices API
+  description: The Settlement Prices API from Delta Exchange — 1 operation(s) for settlement prices.
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Settlement Prices
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-settlement-prices-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-stats-api
+  name: Delta Exchange Stats API
+  description: Get Volume Stats
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Stats
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-stats-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-tradehistory-api
+  name: Delta Exchange Trade History API
+  description: Get Orders History, Get Fill History
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - TradeHistory
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-tradehistory-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-trades-api
+  name: Delta Exchange Trades API
+  description: Get Trades of a contract
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Trades
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-trades-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
+- aid: delta-exchange:delta-exchange-wallet-api
+  name: Delta Exchange Wallet API
+  description: Get balances, Get transaction history
+  humanURL: https://docs.delta.exchange/
+  baseURL: https://api.india.delta.exchange/v2
+  tags:
+  - Wallet
+  properties:
+  - type: OpenAPI
+    url: openapi/delta-exchange-wallet-api-openapi.yml
+  - type: Documentation
+    url: https://docs.delta.exchange/
 x-enrichment:
   date: '2026-10-13'
   status: enriched

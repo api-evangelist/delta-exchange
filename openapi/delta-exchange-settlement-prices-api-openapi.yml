@@ -1,0 +1,527 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Settlement Prices API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Settlement Prices across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Settlement Prices
+paths:
+  /products/?states=expired:
+    get:
+      tags:
+      - Settlement Prices
+      summary: Get product settlement prices
+      operationId: getProduct
+      parameters:
+      - in: query
+        name: states
+        description: 'Comma separated list of states e.g. to get expired contracts https://api.india.delta.exchange/v2/products?contract_types=call_options&states=expired '
+        schema:
+          type: string
+      - in: query
+        name: page_size
+        description: 'size of a single page for paginated request, default: 100'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/Product'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    Index:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the index.
+          example: 14
+        symbol:
+          type: string
+          description: Symbol representing the index, typically prefixed by '.DE' followed by base asset and quoting asset.
+          example: .DEXBTUSD
+        constituent_exchanges:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the constituent exchange.
+                example: ExchangeA
+              weight:
+                type: number
+                description: Weight of the exchange in the index.
+                example: 0.25
+          description: Details of constituent exchanges, including their names and weights in the index.
+        underlying_asset_id:
+          type: integer
+          description: ID of the underlying asset for the index.
+          example: 13
+        quoting_asset_id:
+          type: integer
+          description: ID of the quoting asset for the index.
+          example: 14
+        tick_size:
+          type: string
+          description: Precision of the spot price in decimal format.
+          example: '0.5'
+        index_type:
+          type: string
+          description: Type of the index.
+          enum:
+          - spot_pair
+          - fixed_interest_rate
+          - floating_interest_rate
+          x-enumDescriptions:
+            spot_pair: Index based on a spot trading pair
+            fixed_interest_rate: Index based on a fixed interest rate
+            floating_interest_rate: Index based on a floating interest rate
+          example: spot_pair
+        config:
+          type: object
+          description: Composition config for the index.
+          properties:
+            price_alert_enabled:
+              type: boolean
+            quoting_asset:
+              type: string
+            service_id:
+              type: integer
+            underlying_asset:
+              type: string
+        description:
+          type: string
+          description: Description of the index.
+        impact_size:
+          type: string
+          description: Impact size used for the index price computation.
+        constituent_indices:
+          type: object
+          description: For composite indices, the expression and component indices used to compute this index.
+          properties:
+            expression:
+              type: string
+            indices:
+              type: object
+        health_interval:
+          type: integer
+          description: Interval, in seconds, at which the index health is checked.
+        is_composite:
+          type: boolean
+          description: True if this index is derived from other indices via constituent_indices.
+        price_method:
+          type: string
+          description: Method used to compute the index price.
+      description: Details of an index used in trading, including its constituents and characteristics.
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier for the asset.
+          example: 14
+        symbol:
+          type: string
+          description: Symbol representing the asset.
+          example: USD
+        precision:
+          type: integer
+          description: Number of decimal places supported for the asset.
+          example: 8
+        deposit_status:
+          type: string
+          enum:
+          - enabled
+          - disabled
+          x-enumDescriptions:
+            enabled: Deposits are currently allowed for the asset
+            disabled: Deposits are currently not allowed for the asset
+          description: Indicates if deposits are enabled for the asset.
+          example: enabled
+        withdrawal_status:
+          type: string
+          enum:
+          - enabled
+          - disabled
+          x-enumDescriptions:
+            enabled: Withdrawals are currently allowed for the asset
+            disabled: Withdrawals are currently not allowed for the asset
+          description: Indicates if withdrawals are enabled for the asset.
+          example: enabled
+        base_withdrawal_fee:
+          type: string
+          description: Fixed withdrawal fee for the asset.
+          example: '0.000000000000000000'
+        min_withdrawal_amount:
+          type: string
+          description: Minimum allowable withdrawal amount for the asset.
+          example: '0.000000000000000000'
+        name:
+          type: string
+          description: Full name of the asset.
+          example: US Dollar
+        networks:
+          type: array
+          items:
+            type: object
+          description: Networks supported for depositing/withdrawing this asset. Shape not yet observed populated.
+        interest_credit:
+          type: boolean
+          description: Whether interest is credited on balances of this asset.
+          example: false
+        interest_slabs:
+          description: Interest rate slabs for this asset. Shape unknown - null in every sample observed so far.
+          example: null
+        kyc_deposit_limit:
+          type: string
+          description: Deposit limit for the asset before KYC is required.
+          example: '0.000000000000000000'
+        kyc_withdrawal_limit:
+          type: string
+          description: Withdrawal limit for the asset before KYC is required.
+          example: '0.000000000000000000'
+        minimum_precision:
+          type: integer
+          description: Minimum number of decimal places displayed for the asset.
+          example: 2
+        sort_priority:
+          type: integer
+          description: Display sort order for the asset. Null when not set.
+          example: null
+        variable_withdrawal_fee:
+          type: string
+          description: Variable withdrawal fee for the asset.
+          example: '0.000000000000000000'
+      description: Details of the asset used in the product or contract.
+    ProductSpecs:
+      type: object
+      properties:
+        funding_clamp_value:
+          type: number
+          description: The maximum allowable funding rate clamp value.
+          example: 0.05
+        only_reduce_only_orders_allowed:
+          type: boolean
+          description: Indicates whether only reduce-only orders are allowed.
+          example: false
+        expiry_interval:
+          type: number
+          description: The time interval, in seconds, after which the product or contract expires or settles.
+          example: 28800
+        isolated_liq_penalty_factor:
+          type: number
+          description: The penalty factor applied when an isolated margin position is liquidated.
+          example: 0.01
+        rate_exchange_interval:
+          type: number
+          description: The time interval, in seconds, at which funding rates are exchanged between long and short positions.
+          example: 28800
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tags associated with the product specifications.
+          example:
+          - layer_1
+        vol_expiry_time:
+          type: number
+          description: Time interval, in seconds, used in volatility calculation. Seen on both perpetual and options contracts.
+          example: 172800
+        backup_vol_expiry_time:
+          type: number
+          description: Backup time interval, in seconds, used in volatility calculation when the primary window has insufficient data. Seen on options contracts.
+          example: 31536000
+        max_deviation_from_external_vol:
+          type: number
+          description: Maximum allowed deviation of internal volatility from the external volatility reference. Seen on options contracts.
+          example: 0.75
+        max_lower_deviation_from_external_vol:
+          type: number
+          description: Maximum allowed downward deviation of internal volatility from the external volatility reference. Seen on options contracts.
+          example: 0.75
+        max_upper_deviation_from_external_vol:
+          type: number
+          description: Maximum allowed upward deviation of internal volatility from the external volatility reference. Seen on options contracts.
+          example: 0.5
+        max_volatility:
+          type: number
+          description: Maximum volatility allowed in pricing. Seen on options contracts.
+          example: 3
+        min_volatility:
+          type: number
+          description: Minimum volatility allowed in pricing. Seen on options contracts.
+          example: 0.1
+        premium_commission_rate:
+          type: number
+          description: Commission rate applied on the option premium. Seen on options contracts.
+          example: 0.1
+        vol_calculation_method:
+          type: string
+          description: Method used to calculate volatility. Seen on options contracts.
+          example: orderbook
+      description: Specifications related to the specific product or contract. Which fields are present varies by contract_type - options contracts carry the volatility-related fields, perpetuals carry funding-related fields.
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Unique identifier of a product or contract.
+          example: 27
+        symbol:
+          type: string
+          description: Symbol of the product or contract like BTCUSD, ETHUSD.
+          example: BTCUSD
+        description:
+          type: string
+          description: Detailed description of the product or contract.
+          example: Bitcoin Perpetual futures, quoted, settled & margined in USD
+        created_at:
+          type: string
+          description: Creation timestamp of the product or contract.
+          example: '2023-12-18T13:10:39Z'
+        updated_at:
+          type: string
+          description: Last update timestamp of the product or contract.
+          example: '2024-11-15T02:47:50Z'
+        settlement_time:
+          type: string
+          description: Settlement timestamp for futures contracts.
+          example: null
+        notional_type:
+          type: string
+          enum:
+          - vanilla
+          - inverse
+          x-enumDescriptions:
+            vanilla: Contract is quoted, settled, and margined in the quote currency
+            inverse: Contract is quoted in the quote currency but settled and margined in the base currency
+          description: Type of notional calculation.
+          example: vanilla
+        impact_size:
+          type: integer
+          description: Size of a typical trade used for mark price computation.
+          example: 10000
+        initial_margin:
+          type: string
+          description: Margin required to open a position.
+          example: '0.5'
+        maintenance_margin:
+          type: string
+          description: Minimum margin required to maintain a position.
+          example: '0.25'
+        contract_value:
+          type: string
+          description: Notional value of the contract (spot price x contract amount).
+          example: '0.001'
+        contract_unit_currency:
+          type: string
+          description: Unit of the contract (underlying asset or settling asset).
+          example: BTC
+        tick_size:
+          type: string
+          description: Minimum price interval between two successive prices.
+          example: '0.5'
+        product_specs:
+          type: object
+          description: Specifications related to contract types.
+          $ref: '#/components/schemas/ProductSpecs'
+        state:
+          type: string
+          enum:
+          - live
+          - expired
+          - upcoming
+          x-enumDescriptions:
+            live: Product is currently active and tradable
+            expired: Product has expired and is no longer tradable
+            upcoming: Product is scheduled to go live in the future
+          description: Current state of the product.
+          example: live
+        trading_status:
+          type: string
+          enum:
+          - operational
+          - disrupted_cancel_only
+          - disrupted_post_only
+          x-enumDescriptions:
+            operational: Trading is fully operational; orders can be placed and cancelled
+            disrupted_cancel_only: Trading is disrupted; only order cancellations are allowed
+            disrupted_post_only: Trading is disrupted; only post-only orders are accepted
+          description: Trading status of the contract.
+          example: operational
+        max_leverage_notional:
+          type: string
+          description: Maximum notional position size at the highest leverage.
+          example: '100000'
+        default_leverage:
+          type: string
+          description: Default leverage assigned to the product.
+          example: '200'
+        initial_margin_scaling_factor:
+          type: string
+          description: Scaling factor for initial margin.
+          example: '0.0000025'
+        maintenance_margin_scaling_factor:
+          type: string
+          description: Scaling factor for maintenance margin.
+          example: '0.00000125'
+        taker_commission_rate:
+          type: string
+          description: Commission rate for taker trades.
+          example: '0.0005'
+        maker_commission_rate:
+          type: string
+          description: Commission rate for maker trades.
+          example: '0.0002'
+        liquidation_penalty_factor:
+          type: string
+          description: Factor used to calculate liquidation penalty.
+          example: '0.5'
+        contract_type:
+          type: string
+          description: Type of contract (e.g., futures, perpetual).
+          example: perpetual_futures
+        position_size_limit:
+          type: integer
+          description: Maximum size for a single contract order.
+          example: 229167
+        basis_factor_max_limit:
+          type: string
+          description: Maximum value for annualized basis.
+          example: '10.95'
+        is_quanto:
+          type: boolean
+          description: Indicates if the contract is quanto.
+          example: false
+        funding_method:
+          type: string
+          description: Method used for funding calculation.
+          example: mark_price
+        annualized_funding:
+          type: string
+          description: Maximum allowed annualized funding rate.
+          example: '10.95'
+        price_band:
+          type: string
+          description: Price range allowed around the mark price (percentage).
+          example: '2.5'
+        underlying_asset:
+          $ref: '#/components/schemas/Asset'
+          description: Details of the underlying asset.
+        quoting_asset:
+          $ref: '#/components/schemas/Asset'
+          description: Details of the quoting asset.
+        settling_asset:
+          $ref: '#/components/schemas/Asset'
+          description: Details of the settling asset.
+        spot_index:
+          $ref: '#/components/schemas/Index'
+          description: Spot index used for the product.
+        disruption_reason:
+          type: string
+          description: Reason trading was disrupted. Null when trading_status is operational.
+          example: null
+        impact_notional:
+          type: string
+          description: Notional size of a typical trade used for mark price computation.
+          example: '10000'
+        position_notional_limit:
+          type: string
+          description: Maximum notional position size allowed. Null when not applicable.
+          example: null
+        auction_start_time:
+          type: string
+          description: Start timestamp of the settlement auction.
+          example: '2026-08-13T05:51:51Z'
+        settlement_price:
+          type: string
+          description: Settlement price of the contract. Null before settlement.
+          example: null
+        auction_finish_time:
+          type: string
+          description: Finish timestamp of the settlement auction. Null before the auction ends.
+          example: null
+        strike_price:
+          type: string
+          description: Strike price for an options contract. Null for non-options contracts.
+          example: '63600'
+        short_description:
+          type: string
+          description: Short form description of the product.
+          example: BTC  Call
+        ui_config:
+          type: object
+          description: Display configuration used by trading UIs. Not part of the core contract terms.
+          properties:
+            default_trading_view_candle:
+              type: string
+              example: '60'
+            leverage_slider_values:
+              type: array
+              items:
+                type: number
+            price_clubbing_values:
+              type: array
+              items:
+                type: number
+            show_bracket_orders:
+              type: boolean
+            sort_priority:
+              type: integer
+            tags:
+              type: array
+              items:
+                type: string
+        launch_time:
+          type: string
+          description: Timestamp the product was launched for trading.
+          example: '2020-04-20T08:37:05Z'
+        insurance_fund_margin_contribution:
+          type: string
+          description: Contribution of this product's margin to the insurance fund.
+          example: '5'
+        barrier_price:
+          type: string
+          description: Barrier price for a barrier options contract. Null for other contract types.
+          example: null
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

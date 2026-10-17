@@ -1,3 +1,5 @@
+# x-archived-from: delta-exchange-openapi.yml
+# x-archived-on: 2026-10-16
 swagger: '2.0'
 info:
   description: '## REST API for Delta Exchange

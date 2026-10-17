@@ -1,0 +1,177 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Historical OHLC Candles/Sparklines API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Historical OHLC Candles/Sparklines across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Historical OHLC Candles/Sparklines
+paths:
+  /history/candles:
+    get:
+      summary: GET historical ohlc candles
+      description: It returns historical Open-High-Low-Close(ohlc) candles data of the symbol as per input values for resolution, start time and end time. Also, it can return only upto 2000 candles maximum in a response.
+      tags:
+      - Historical OHLC Candles/Sparklines
+      operationId: getCandles
+      deprecated: false
+      parameters:
+      - in: query
+        name: resolution
+        description: ohlc candle time frames like 1m, 5m, 1h
+        x-enumDescriptions:
+          1m: 1-minute candles
+          3m: 3-minute candles
+          5m: 5-minute candles
+          15m: 15-minute candles
+          30m: 30-minute candles
+          1h: 1-hour candles
+          2h: 2-hour candles
+          4h: 4-hour candles
+          6h: 6-hour candles
+          1d: 1-day candles
+          1w: 1-week candles
+        required: true
+        example: 5m
+        schema:
+          type: string
+          enum:
+          - 1m
+          - 3m
+          - 5m
+          - 15m
+          - 30m
+          - 1h
+          - 2h
+          - 4h
+          - 6h
+          - 1d
+          - 1w
+      - in: query
+        name: symbol
+        description: To get funding history pass symbol as FUNDING:${symbol}, mark price MARK:${symbol} and OI data OI:${symbol} for e.g. - FUNDING:BTCUSD, MARK:C-BTC-66400-010824, OI:ETHUSD
+        required: true
+        example: BTCUSD
+        schema:
+          type: string
+      - in: query
+        name: start
+        description: 'Start time: unix timestamp in seconds'
+        required: true
+        example: 1685618835
+        schema:
+          type: integer
+      - in: query
+        name: end
+        description: 'End time: unix timestamp in seconds'
+        required: true
+        example: 1722511635
+        schema:
+          type: integer
+      responses:
+        '200':
+          description: ohlc
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/ArrayOfOHLCData'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+  /history/sparklines:
+    get:
+      summary: GET product history sparklines
+      tags:
+      - Historical OHLC Candles/Sparklines
+      operationId: getSparklines
+      deprecated: false
+      parameters:
+      - in: query
+        name: symbols
+        description: comma separated product symbols
+        required: true
+        example: ETHUSD,MARK:BTCUSD
+        schema:
+          type: string
+      responses:
+        '200':
+          description: product history sparkline
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/SparklineData'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    ArrayOfOHLCData:
+      type: array
+      items:
+        $ref: '#/components/schemas/OHLCData'
+    OHLCData:
+      type: object
+      description: A ohlc object
+      properties:
+        time:
+          type: integer
+        open:
+          type: number
+        high:
+          type: number
+        low:
+          type: number
+        close:
+          type: number
+        volume:
+          type: number
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    SparklineData:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          type: integer
+        description: array of timestamp and closing value
+      example:
+        ETHUSD:
+        - - 1594214051
+          - 3.826e-05
+        - - 1594214051
+          - 3.826e-05
+        MARK:BTCUSD:
+        - - 1594215270
+          - 3.826e-05
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml
