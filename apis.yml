@@ -221,6 +221,8 @@ apis:
   humanURL: https://docs.delta.exchange/
   baseURL: https://api.india.delta.exchange/v2
   tags:
+  - Order Book
+  tags_raw:
   - Orderbook
   properties:
   - type: OpenAPI
@@ -238,6 +240,8 @@ apis:
   humanURL: https://docs.delta.exchange/
   baseURL: https://api.india.delta.exchange/v2
   tags:
+  - Order
+  tags_raw:
   - Orders
   properties:
   - type: OpenAPI
@@ -262,6 +266,8 @@ apis:
   humanURL: https://docs.delta.exchange/
   baseURL: https://api.india.delta.exchange/v2
   tags:
+  - Product
+  tags_raw:
   - Products
   properties:
   - type: OpenAPI
@@ -298,6 +304,8 @@ apis:
   humanURL: https://docs.delta.exchange/
   baseURL: https://api.india.delta.exchange/v2
   tags:
+  - Trade History
+  tags_raw:
   - TradeHistory
   properties:
   - type: OpenAPI
@@ -310,6 +318,8 @@ apis:
   humanURL: https://docs.delta.exchange/
   baseURL: https://api.india.delta.exchange/v2
   tags:
+  - Trade
+  tags_raw:
   - Trades
   properties:
   - type: OpenAPI
@@ -322,6 +332,8 @@ apis:
   humanURL: https://docs.delta.exchange/
   baseURL: https://api.india.delta.exchange/v2
   tags:
+  - Wallets
+  tags_raw:
   - Wallet
   properties:
   - type: OpenAPI
