@@ -1,16 +1,18 @@
 openapi: 3.2.0
 info:
-  title: Delta Exchange Orders API
+  description: '## REST API for Delta Exchange
+
+    Find out more on https://delta.exchange'
   version: 1.0.0
+  title: Delta Exchange Orders API
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
   contact:
     email: support@delta.exchange
-  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
-  description: 'Operations tagged Orders across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
-- url: https://api.india.delta.exchange/v2
+- url: https://api.india.delta.exchange/
 tags:
 - name: Orders
-  description: Placing Orders, Cancelling Orders, Placing batch orders, Cancelling batch orders, Get Open orders, Change Orders Leverage. Rate limits have been introduced recently that allows only set number of operations inside a matching engine in a timeframe. The current rate limits is 500 operations/sec for each product. For ex - placing 50 orders in a batch is equivalent to 50 operations as these orders will be processed by matching engine. Rate limits do not apply when cancelling orders.
+  description: Placing Orders, Cancelling Orders, Placing batch orders, Cancelling batch orders, Get Open orders, Change Orders Leverage
 paths:
   /orders:
     post:
@@ -28,24 +30,38 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
         '400':
           description: Returns [error](#place-order-error-description) if order could not be placed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - InsufficientMargin
+                    - OrderSizeExceededAvailable
+                    - OrderExceedsSizeLimit
+                    - OrderLeverageNotSet
+                    - InvalidProduct
+                    - ImmediateLiquidationOrder
+                    - LowerthanBankruptcy
+                    - SelfMatchingPostOnlyMode
+                    - ImmediateExecutionPostOnlyOrder
+                    - BracketOrderPositionExists
+                    - InvalidBracketOrder
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
+              type: array
               $ref: '#/components/schemas/CreateOrderRequest'
-        description: Order which needs to be created. Rate limits apply.
+        description: Order which needs to be created
         required: true
     delete:
       tags:
@@ -62,25 +78,81 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
         '400':
           description: Returns error if order could not be cancelled
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - ALREADY_FILLED
+                    - InvalidOrder
+                    - InvalidProduct
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
+              type: array
               $ref: '#/components/schemas/DeleteOrderRequest'
         description: Order which needs to be cancelled
         required: true
+    get:
+      tags:
+      - Orders
+      summary: Get Orders
+      operationId: getOrders
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      parameters:
+      - in: query
+        name: product_id
+        description: get orders for a particular product id
+        schema:
+          type: integer
+      - in: query
+        name: state
+        description: get orders with a particular state
+        schema:
+          type: string
+          enum:
+          - open
+          - closed
+          - cancelled
+      - in: query
+        name: stop_order_type
+        description: get stop orders with stop_order_type
+        schema:
+          type: string
+          enum:
+          - stop_loss_order
+      - in: query
+        name: page_num
+        description: page number for pagination
+        schema:
+          type: integer
+          default: 1
+      - in: query
+        name: page_size
+        description: page size for pagination
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: List of orders as per the query
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfOrders'
     put:
       tags:
       - Orders
@@ -96,200 +168,42 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/Order'
+                $ref: '#/components/schemas/Order'
         '400':
           description: Returns [error](#place-order-error-description) if order could not be placed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - InsufficientMargin
+                    - OrderSizeExceededAvailable
+                    - OrderExceedsSizeLimit
+                    - OrderLeverageNotSet
+                    - InvalidProduct
+                    - ImmediateLiquidationOrder
+                    - LowerthanBankruptcy
+                    - SelfMatchingPostOnlyMode
+                    - ImmediateExecutionPostOnlyOrder
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
+              type: array
               $ref: '#/components/schemas/EditOrderRequest'
-        description: Order which needs to be edited. Rate limits apply.
+        description: Order which needs to be edited
         required: true
-    get:
-      summary: Get Active Orders
-      tags:
-      - Orders
-      operationId: getOrders
-      deprecated: false
-      security:
-      - api-key: []
-        signature: []
-        timestamp: []
-      parameters:
-      - in: query
-        name: product_ids
-        description: Comma-separated product IDs. Maximum 10 IDs allowed. If not specified, all the orders will be returned
-        example: 27,5
-        schema:
-          type: string
-      - in: query
-        name: states
-        description: comma separated list of states - open,pending
-        example: open, pending, closed
-        schema:
-          type: string
-      - in: query
-        name: contract_types
-        description: comma separated list of desired contract types, if not specified any parameters then, all the orders will be returned
-        x-enumDescriptions:
-          futures: Dated futures contracts with a fixed expiry
-          perpetual_futures: Futures contracts with no expiry, funded via funding rate
-          call_options: Call option contracts
-          put_options: Put option contracts
-        example: futures, perpetual_futures, call_options
-        schema:
-          type: string
-          enum:
-          - futures
-          - perpetual_futures
-          - call_options
-          - put_options
-      - in: query
-        name: order_types
-        description: comma separated order types
-        x-enumDescriptions:
-          market: Market order executed at the best available price
-          limit: Limit order placed at a specified price
-          stop_market: Stop order that triggers a market order at the stop price
-          stop_limit: Stop order that triggers a limit order at the stop price
-          all_stop: All stop orders (stop_market and stop_limit)
-        example: market, limit, stop_limit
-        schema:
-          type: string
-          enum:
-          - market
-          - limit
-          - stop_market
-          - stop_limit
-          - all_stop
-      - in: query
-        name: start_time
-        description: from time in micro-seconds in epoc; referring to the order creation time
-        example: 1725174294000000
-        schema:
-          type: integer
-      - in: query
-        name: end_time
-        description: from time in micro-seconds in epoc; referring to the order creation time
-        example: 1725865494000000
-        schema:
-          type: integer
-      - in: query
-        name: after
-        description: after cursor for pagination; becomes null if page after the current one does not exist
-        example: g3QAAAACZAAKY3JlYXRlZF9hdHQAAAAN
-        schema:
-          type: string
-      - in: query
-        name: before
-        description: before cursor for pagination; becomes null if page before the current one does not exist
-        example: a2PQRSACZAAKY3JlYXRlZF3fnqHBBBNZL
-        schema:
-          type: string
-      - in: query
-        name: page_size
-        description: number of records per page
-        example: 50
-        schema:
-          type: integer
-          default: 10
-      responses:
-        '200':
-          description: List of orders as per the query
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/ArrayOfOrders'
-                    meta:
-                      $ref: '#/components/schemas/PaginationMeta'
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /orders/bracket:
-    post:
-      tags:
-      - Orders
-      summary: Place Bracket order
-      description: A bracket order is a set of TP and SL order. For a bracket order , size need not be specified as it closes the entire position. For a given contract, you can have multiple bracket orders for open orders but only a single bracket order for any open position.
-      operationId: bracketOrder
-      security:
-      - api-key: []
-        signature: []
-        timestamp: []
-      responses:
-        '200':
-          description: returns back success response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiSuccessResponse'
-        '400':
-          description: Returns error if orders could not be updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateBracketOrderRequest'
-        description: 'Bracket Order which needs to be updated '
-        required: true
-    put:
-      tags:
-      - Orders
-      summary: Edit Bracket order
-      description: A bracket order is a set of TP and SL order. You can specify bracket order with an order that will create a new position. Use this api to change the bracket params attached with an order.
-      operationId: putOrdersBracket
-      security:
-      - api-key: []
-        signature: []
-        timestamp: []
-      responses:
-        '200':
-          description: returns back success response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiSuccessResponse'
-        '400':
-          description: Returns error if orders could not be updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EditBracketOrderRequest'
-        description: 'Bracket Order which needs to be updated '
-        required: true
-      x-operation-id-source: normalized
-      x-operation-id-original: bracketOrder
-    servers:
-    - url: https://api.india.delta.exchange/v2
   /orders/all:
     delete:
       tags:
       - Orders
       summary: Cancel all open orders
-      description: Cancels all orders for a given product id. If product id is not provided, it cancels orders for provided contract types. If none of them are provided, it cancels all the orders. Provide either product id or list of contract types at a time. If both are provided, contract types will be ignored.
       operationId: cancelAllOrders
       security:
       - api-key: []
@@ -301,27 +215,76 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiSuccessResponse'
+                type: object
         '400':
           description: Returns error if orders could not be cancelled
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - InvalidProduct
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
+              type: array
               $ref: '#/components/schemas/CancelAllFilterObject'
         description: Filters for selecting orders that needs to be cancelled
-    servers:
-    - url: https://api.india.delta.exchange/v2
+  /orders/bracket:
+    deprecated: true
+    description: __DEPRECATED__
+    post:
+      tags:
+      - Orders
+      summary: Place Bracket Order __DEPRECATED__
+      operationId: placeBracketOrder
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Returns back the stop loss and take profit orders with assigned ids and latest states
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BracketOrder'
+        '400':
+          description: Returns error if order could not be placed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - ImmediateExecutionStopOrder
+                    - CloseOnTriggerExists
+                    - NoOpenPosition
+                  message:
+                    type: string
+                    description: A more verbose error message
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              $ref: '#/components/schemas/CreateBracketOrderRequest'
+        description: Bracket order which needs to be created
+        required: true
   /orders/batch:
     post:
       tags:
       - Orders
       summary: Create batch orders
-      description: Orders in a batch should belong to the same contract. Max allowed size limit in a batch is 50. Rate limits apply. Please note that ioc is not valid time in force values for creating batch orders.
       operationId: batchCreate
       security:
       - api-key: []
@@ -333,28 +296,36 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/ArrayOfOrders'
+                $ref: '#/components/schemas/Order'
         '400':
           description: returns error if orders couldnt be placed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - InsufficientMargin
+                    - OrderSizeExceededAvailable
+                    - OrderExceedsSizeLimit
+                    - OrderLeverageNotSet
+                    - InvalidProduct
+                    - ImmediateLiquidationOrder
+                    - LowerthanBankruptcy
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              $ref: '#/components/schemas/BatchCreateOrdersRequest'
+              $ref: '#/components/schemas/ArrayOfCreateOrderRequest'
         description: Does not support time_in_force flag for orders, All orders in batch create are assumed to be gtc orders. batch create does not support stop orders, it support only limit orders
         required: true
     put:
-      description: Orders to be edited in a batch. Rate limits apply.
+      description: batch order edit
       summary: Edit batch orders
       tags:
       - Orders
@@ -366,33 +337,38 @@ paths:
         timestamp: []
       responses:
         '200':
-          description: List of edited orders
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/ArrayOfOrders'
+          description: ''
+          headers: {}
         '400':
           description: returns error if orders couldnt be edited
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - InsufficientMargin
+                    - OrderSizeExceededAvailable
+                    - OrderExceedsSizeLimit
+                    - OrderLeverageNotSet
+                    - InvalidProduct
+                    - ImmediateLiquidationOrder
+                    - LowerthanBankruptcy
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              $ref: '#/components/schemas/BatchEditOrdersRequest'
+              $ref: '#/components/schemas/EditBatchOrders'
         required: true
     delete:
       tags:
       - Orders
-      summary: Delete batch orders
+      summary: Delele batch orders
       operationId: batchDelete
       security:
       - api-key: []
@@ -404,90 +380,31 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/ArrayOfOrders'
+                $ref: '#/components/schemas/Order'
         '400':
           description: returns error if orders couldnt be deleted
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - ALREADY_FILLED
+                    - InvalidOrder
+                    - InvalidProduct
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              $ref: '#/components/schemas/BatchDeleteOrdersRequest'
+              type: array
+              $ref: '#/components/schemas/ArrayOfDeleteOrderRequest'
         required: true
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /orders/{order_id}:
-    get:
-      tags:
-      - Orders
-      summary: Get Order by id
-      operationId: getOrderById
-      security:
-      - api-key: []
-        signature: []
-        timestamp: []
-      parameters:
-      - in: path
-        name: order_id
-        description: Id of the order
-        schema:
-          type: string
-        required: true
-      responses:
-        '200':
-          description: Returns back the order object with assigned id and latest state
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/Order'
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /orders/client_order_id/{client_oid}:
-    get:
-      tags:
-      - Orders
-      summary: Get Order by client oid
-      operationId: getOrderByCOI
-      security:
-      - api-key: []
-        signature: []
-        timestamp: []
-      parameters:
-      - in: path
-        name: client_oid
-        description: Custom user provided order id (max 32 length)
-        schema:
-          type: string
-        required: true
-      responses:
-        '200':
-          description: Returns back the order object with assigned client order id and latest state
-          content:
-            application/json:
-              schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/Order'
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /products/{product_id}/orders/leverage:
+  /orders/leverage:
     post:
       tags:
       - Orders
@@ -497,51 +414,41 @@ paths:
       - api-key: []
         signature: []
         timestamp: []
-      parameters:
-      - in: path
-        name: product_id
-        description: Product id of the ordered product. Either product_id or product_symbol must be preseent.
-        required: true
-        example: 27
-        schema:
-          type: integer
-      - in: path
-        name: product_symbol
-        description: Product symbol of the ordered product. Either product_id or product_symbol must be preseent.
-        required: true
-        example: BTCUSD
-        schema:
-          type: string
       responses:
         '200':
           description: returns the OrderLeverage object
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/OrderLeverage'
+                $ref: '#/components/schemas/OrderLeverage'
         '400':
           description: Returns error if leverage couldnt be changed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - InsufficientMargin
+                    - LeverageLimitExceeded
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
               type: object
               required:
+              - product_id
               - leverage
               properties:
+                product_id:
+                  type: integer
                 leverage:
                   type: string
-                  description: Order leverage
-                  example: 10
         required: true
     get:
       tags:
@@ -553,11 +460,9 @@ paths:
         signature: []
         timestamp: []
       parameters:
-      - in: path
+      - in: query
         name: product_id
-        description: Product id of the ordered product
         required: true
-        example: 27
         schema:
           type: integer
       responses:
@@ -566,93 +471,34 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/OrderLeverage'
-    servers:
-    - url: https://api.india.delta.exchange/v2
+                $ref: '#/components/schemas/OrderLeverage'
 components:
   schemas:
-    ArrayOfOrders:
-      type: array
-      items:
-        $ref: '#/components/schemas/Order'
-    BatchCreateOrder:
+    CreateBracketOrderRequest:
+      deprecated: true
       type: object
-      description: A create order object
-      required:
-      - size
-      - side
-      - order_type
+      description: __DEPRECATED__  bracket order object
       properties:
-        limit_price:
-          type: string
-          description: Price level for limit orders
-          example: '59000'
-        size:
+        product_id:
           type: integer
-          description: Order size
-          example: 10
-        side:
-          type: string
-          description: Buy order or Sell order
-          enum:
-          - buy
-          - sell
-          x-enumDescriptions:
-            buy: Buy order on the product
-            sell: Sell order on the product
-          example: buy
-        order_type:
-          type: string
-          description: Limit order(limit_price must be defined) or Market order
-          enum:
-          - limit_order
-          - market_order
-          x-enumDescriptions:
-            limit_order: Order placed at a specified limit price
-            market_order: Order executed at the best available market price
-          default: market_order
-          example: limit_order
-        time_in_force:
-          type: string
-          description: GTC/IOC order type
-          enum:
-          - gtc
-          - ioc
-          x-enumDescriptions:
-            gtc: Good-till-cancelled; order stays open until filled or cancelled
-            ioc: Immediate-or-cancel; unfilled portion is cancelled immediately
-          example: gtc
-        mmp:
-          type: string
-          description: MMP level for the order - disabled/mmp1/mmp2/mmp3/mmp4/mmp5
-          enum:
-          - disabled
-          - mmp1
-          - mmp2
-          - mmp3
-          - mmp4
-          - mmp5
-          example: disabled
-        post_only:
-          type: string
-          description: Post only order
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Order is rejected if it would take liquidity from the orderbook
-            'false': Order is allowed to take liquidity from the orderbook
-          default: false
-          example: false
-        client_order_id:
-          type: string
-          description: custom id to be set for the order, provided by user. Must be unique across all open orders of the user (max 32 length)
-          example: my_signal_34521712
+        stop_loss_order:
+          type: object
+          properties:
+            order_type:
+              type: string
+              enum:
+              - market_order
+            stop_price:
+              type: string
+        take_profit_order:
+          type: object
+          properties:
+            order_type:
+              type: string
+              enum:
+              - market_order
+            stop_price:
+              type: string
     OrderLeverage:
       type: object
       description: Order Leverage for a product
@@ -660,710 +506,203 @@ components:
         leverage:
           type: string
           description: Leverage of all open orders for this product
-          example: 10
         order_margin:
           type: string
           description: Margin blocked in open orders for this product
-          example: '563.2'
         product_id:
           type: integer
-          description: Product id of the ordered product
-          example: 27
-    BatchDeleteOrdersRequest:
-      type: object
-      oneOf:
-      - required:
-        - product_id
-      - required:
-        - product_symbol
-      properties:
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/BatchDeleteOrder'
-    EditBracketOrderRequest:
-      type: object
-      description: bracket order object
-      required:
-      - id
-      - product_id
-      - product_symbol
-      properties:
-        id:
-          type: integer
-          required: true
-          description: Order ID for which bracket params are being updated
-          example: 34521712
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
-        bracket_stop_loss_limit_price:
-          type: string
-          description: stop loss limit price for bracket order
-          example: '55000'
-        bracket_stop_loss_price:
-          type: string
-          description: stop loss trigger price for bracket order
-          example: '56000'
-        bracket_take_profit_limit_price:
-          type: string
-          description: take profit limit price for bracket order
-          example: '65000'
-        bracket_take_profit_price:
-          type: string
-          description: take profit trigger price for bracket order
-          example: '64000'
-        bracket_trail_amount:
-          type: string
-          description: trail amount of bracket order
-          example: '50'
-        bracket_stop_trigger_method:
-          type: string
-          description: stop order trigger method for bracket orders- mark_price/last_traded_price/spot_price
-          enum:
-          - mark_price
-          - last_traded_price
-          - spot_price
-          x-enumDescriptions:
-            mark_price: Bracket order triggered against the mark price
-            last_traded_price: Bracket order triggered against the last traded price
-            spot_price: Bracket order triggered against the spot index price
-          default: mark_price
-          example: last_traded_price
-    PaginationMeta:
-      type: object
-      properties:
-        after:
-          type: string
-          description: after cursor for pagination; becomes null if page after the current one does not exist
-          example: g3QAAAACZAAKY3JlYXRlZF9hdHQAAAAN
-        before:
-          type: string
-          description: before cursor for pagination; becomes null if page before the current one does not exist
-          example: a2PQRSACZAAKY3JlYXRlZF3fnqHBBBNZL
-    CancelAllFilterObject:
-      type: object
-      description: Cancel all request filter object
-      properties:
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        contract_types:
-          type: string
-          description: comma separated list of desired contract types
-          example: perpetual_futures,put_options,call_options
-        cancel_limit_orders:
-          type: string
-          description: set true to cancel open limit orders
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Include open limit orders in the cancellation
-            'false': Exclude open limit orders from the cancellation
-          example: false
-        cancel_stop_orders:
-          type: string
-          description: set as true to cancel stop orders
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Include open stop orders in the cancellation
-            'false': Exclude open stop orders from the cancellation
-          example: false
-        cancel_reduce_only_orders:
-          type: string
-          description: set as true to cancel reduce only orders
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Include open reduce-only orders in the cancellation
-            'false': Exclude open reduce-only orders from the cancellation
-          example: false
-    ApiErrorResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          default: false
-        error:
-          type: object
-    ApiSuccessResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          default: true
-    BatchDeleteOrder:
-      type: object
-      description: A delete order object
-      properties:
-        id:
-          type: integer
-          description: use bracket trail amount if you want a trailing stop order. Required if bracket stop price is empty
-          example: 13452112
-        client_order_id:
-          type: string
-          description: client order id of the order to be cancelled. Since client order id is unique across all open orders of the user, it can be used to uniquely identify the order (max 32 length)
-          example: my_signal_34521712
-    CreateOrderRequest:
-      type: object
-      description: A create order object
-      required:
-      - product_id
-      - product_symbol
-      - size
-      - side
-      - order_type
-      properties:
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
-        limit_price:
-          type: string
-          description: Price level for limit orders
-          example: '59000'
-        size:
-          type: integer
-          description: Order size
-          example: 10
-        side:
-          type: string
-          description: Buy order or Sell order
-          enum:
-          - buy
-          - sell
-          x-enumDescriptions:
-            buy: Buy order on the product
-            sell: Sell order on the product
-          example: buy
-        order_type:
-          type: string
-          description: Limit order(limit_price must be defined) or Market order
-          enum:
-          - limit_order
-          - market_order
-          x-enumDescriptions:
-            limit_order: Order placed at a specified limit price
-            market_order: Order executed at the best available market price
-          default: market_order
-          example: limit_order
-        stop_order_type:
-          type: string
-          description: Stop order type - stop loss or take profit. liquidation_order is not accepted here; it is only ever generated by the system and returned in responses.
-          enum:
-          - stop_loss_order
-          - take_profit_order
-          x-enumDescriptions:
-            stop_loss_order: Order triggered when stop price is hit to limit losses
-            take_profit_order: Order triggered when take profit price is hit to lock in gains
-          example: stop_loss_order
-        stop_price:
-          type: string
-          description: Stop loss price level if the order is stop order
-          example: '56000'
-        trail_amount:
-          type: string
-          description: Use trail amount if you want a trailing stop order. Required if stop price is empty.
-          example: '50'
-        stop_trigger_method:
-          type: string
-          description: Stop order trigger method - mark_price/last_traded_price/spot_price
-          enum:
-          - mark_price
-          - last_traded_price
-          - spot_price
-          x-enumDescriptions:
-            mark_price: Order triggered against the mark price
-            last_traded_price: Order triggered against the last traded price
-            spot_price: Order triggered against the spot index price
-          default: mark_price
-          example: last_traded_price
-        bracket_stop_trigger_method:
-          type: string
-          description: stop order trigger method for bracket orders - mark_price/last_traded_price/spot_price
-          enum:
-          - mark_price
-          - last_traded_price
-          - spot_price
-          x-enumDescriptions:
-            mark_price: Bracket order triggered against the mark price
-            last_traded_price: Bracket order triggered against the last traded price
-            spot_price: Bracket order triggered against the spot index price
-          default: mark_price
-          example: last_traded_price
-        bracket_stop_loss_limit_price:
-          type: string
-          description: Bracket order stop loss limit price
-          example: '57000'
-        bracket_stop_loss_price:
-          type: string
-          description: Bracket order stop loss trigger price
-          example: '56000'
-        bracket_trail_amount:
-          type: string
-          description: use bracket trail amount if you want a trailing stop order. Required if bracket stop price is empty
-          example: '50'
-        bracket_take_profit_limit_price:
-          type: string
-          description: Bracket order take profit limit price
-          example: '62000'
-        bracket_take_profit_price:
-          type: string
-          description: take profit trigger price for bracket order
-          example: '61000'
-        time_in_force:
-          type: string
-          description: GTC/IOC order type
-          enum:
-          - gtc
-          - ioc
-          x-enumDescriptions:
-            gtc: Good-till-cancelled; order stays open until filled or cancelled
-            ioc: Immediate-or-cancel; unfilled portion is cancelled immediately
-          example: gtc
-        mmp:
-          type: string
-          description: MMP level for the order - disabled/mmp1/mmp2/mmp3/mmp4/mmp5
-          enum:
-          - disabled
-          - mmp1
-          - mmp2
-          - mmp3
-          - mmp4
-          - mmp5
-          example: disabled
-        post_only:
-          type: string
-          description: Post only order
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Order is rejected if it would take liquidity from the orderbook
-            'false': Order is allowed to take liquidity from the orderbook
-          default: false
-          example: false
-        reduce_only:
-          type: string
-          description: if set, will only close positions. New orders will not be placed
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Order can only reduce or close an existing position
-            'false': Order can open or increase a position
-          default: false
-          example: false
-        client_order_id:
-          type: string
-          description: custom id to be set for the order, provided by user. Must be unique across all open orders of the user (max 32 length)
-          example: my_signal_345212
-        cancel_orders_accepted:
-          type: string
-          description: if set, will cancel all existing orders for the product
-          enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': User accepts that existing orders for this product may be cancelled to free margin
-            'false': Existing orders should not be cancelled to free margin
-          default: false
-          example: false
-    BatchCreateOrdersRequest:
-      type: object
-      oneOf:
-      - required:
-        - product_id
-      - required:
-        - product_symbol
-      properties:
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/BatchCreateOrder'
-    CreateBracketOrderRequest:
-      type: object
-      description: bracket order object
-      required:
-      - product_id
-      - product_symbol
-      properties:
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
-        stop_loss_order:
-          type: object
-          properties:
-            order_type:
-              type: string
-              description: Limit order(limit_price must be defined) or Market order
-              enum:
-              - limit_order
-              - market_order
-              x-enumDescriptions:
-                limit_order: Stop loss is placed as a limit order at the specified limit price
-                market_order: Stop loss is placed as a market order at the best available price
-              default: market_order
-              example: limit_order
-            stop_price:
-              type: string
-              description: Stop loss price level
-              example: '56000'
-            trail_amount:
-              type: string
-              description: Use trail amount if you want a trailing stop order. Required if stop price is empty.
-              example: '50'
-            limit_price:
-              type: string
-              description: required for limit orders
-              example: '55000'
-        take_profit_order:
-          type: object
-          properties:
-            order_type:
-              type: string
-              description: Limit order(limit_price must be defined) or Market order
-              enum:
-              - limit_order
-              - market_order
-              x-enumDescriptions:
-                limit_order: Take profit is placed as a limit order at the specified limit price
-                market_order: Take profit is placed as a market order at the best available price
-              default: market_order
-              example: limit_order
-            stop_price:
-              type: string
-              description: Stop price level
-              example: '65000'
-            limit_price:
-              type: string
-              description: required for limit orders
-              example: '64000'
-        bracket_stop_trigger_method:
-          type: string
-          description: stop order trigger method for bracket orders- mark_price/last_traded_price/spot_price
-          enum:
-          - mark_price
-          - last_traded_price
-          - spot_price
-          x-enumDescriptions:
-            mark_price: Bracket order triggered against the mark price
-            last_traded_price: Bracket order triggered against the last traded price
-            spot_price: Bracket order triggered against the spot index price
-          default: mark_price
-          example: last_traded_price
-    BatchEditOrdersRequest:
-      type: object
-      oneOf:
-      - required:
-        - product_id
-      - required:
-        - product_symbol
-      properties:
-        product_id:
-          type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
-        orders:
-          type: array
-          items:
-            $ref: '#/components/schemas/BatchEditOrder'
-    BatchEditOrder:
-      type: object
-      description: edit order object
-      required:
-      - id
-      - size
-      - order_type
-      properties:
-        id:
-          type: integer
-          description: existing order id to be edited
-          example: 34521712
-        limit_price:
-          type: string
-          description: Price level for limit orders
-          example: '59000'
-        size:
-          type: integer
-          description: total size after editing order
-          example: 15
-        mmp:
-          type: string
-          description: MMP level for the order - disabled/mmp1/mmp2/mmp3/mmp4/mmp5
-          enum:
-          - disabled
-          - mmp1
-          - mmp2
-          - mmp3
-          - mmp4
-          - mmp5
-          example: disabled
-        post_only:
-          type: string
-          description: Post only order
-          enum:
-          - 'false'
-          - 'true'
-          x-enumDescriptions:
-            'false': Order is allowed to take liquidity from the orderbook
-            'true': Order is rejected if it would take liquidity from the orderbook
-          default: false
-          example: false
     EditOrderRequest:
       type: object
       description: edit order object
-      required:
-      - id
-      - product_id
-      - product_symbol
-      - size
       properties:
         id:
           type: integer
-          description: existing order id to be edited
-          example: 34521712
         product_id:
           type: integer
-          description: Only one of either product_id or product_symbol must be sent.
-          example: 27
-        product_symbol:
-          type: string
-          description: Only one of either product_id or product_symbol must be sent.
-          example: BTCUSD
         limit_price:
           type: string
-          description: Price level for limit orders
-          example: '59000'
         size:
           type: integer
           description: total size after editing order
-          example: 15
-        mmp:
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id of a product or a contract
+        symbol:
           type: string
-          description: MMP level for the order - disabled/mmp1/mmp2/mmp3/mmp4/mmp5
+          description: symbol of a product or a contract e.g. LINKBTC, XRPUSDQ
+        description:
+          type: string
+          description: description of a product or a contract
+        created_at:
+          type: string
+          description: product/contract creation date and time
+        updated_at:
+          type: string
+          description: product/contract update date and time
+        settlement_time:
+          type: string
+          description: settlement Timestamp of futures contract
+        product_type:
+          type: string
           enum:
-          - disabled
-          - mmp1
-          - mmp2
-          - mmp3
-          - mmp4
-          - mmp5
-          example: disabled
-        post_only:
+          - future
+          - inverse_future
+          description: contract type 'future' or 'inverse_future'
+        pricing_source:
           type: string
-          description: Post only order
+          description: source and method of contract pricing
+        impact_size:
+          type: integer
+          description: size of a typical trade. Used in the computation of mark price
+        initial_margin:
+          type: integer
+          description: The amount required to enter into a new position
+        maintenance_margin:
+          type: string
+          description: 'The amount necessary when a loss on a futures position requires you to allocate more funds to return the margin to the initial margin level. '
+        contract_value:
+          type: string
+          description: The notional value of a futures contract is simply the spot price of the asset multiplied by the amount of the asset specified in the contract
+        contract_unit_currency:
+          type: string
+          description: This is the unit of  1 contract, for vanilla futures, its underlying asset. for inverse, it is settling asset. for quanto, its settling asset / quoting asset
+        tick_size:
+          type: string
+          description: The minimum gap between 2 consecutive prices.
+        trading_status:
+          type: string
           enum:
-          - 'true'
-          - 'false'
-          x-enumDescriptions:
-            'true': Order is rejected if it would take liquidity from the orderbook
-            'false': Order is allowed to take liquidity from the orderbook
-          default: false
-          example: false
-        stop_price:
+          - operational
+          - disrupted_cancel_only
+          - disrupted_post_only
+          description: 'trading status of the contract e.g. ''operational'',''disrupted_cancel_only'' or ''disrupted_post_only'' '
+        max_leverage_notional:
           type: string
-          description: price to trigger stop order
-          example: '56000'
-        trail_amount:
+          description: maximum notional position size (in settling asset terms) that can be acquired at highest allowed leverage for a given contract.
+        default_leverage:
           type: string
-          description: Use trail amount if you want a trailing stop order. Required if stop price is empty.
-          example: '50'
+          description: default leverage
+        initial_margin_scaling_factor:
+          type: string
+        maintenance_margin_scaling_factor:
+          type: string
+        commission_rate:
+          type: string
+          description: rate at which commission fee will be calculated for a trade in given contract
+        maker_commission_rate:
+          type: string
+          description: rate at which maker rebate will be calculated
+        liquidation_penalty_factor:
+          type: string
+          description: 'Determines liquidation charge as per the following formula: liquidation_penalty_factor * minimum maintenance margin'
+        contract_type:
+          type: string
+          description: ' Type of contracts e.g. futures, perpetual futures, '
+        position_size_limit:
+          type: integer
+          description: Maximum size of contracts in a single order can be placed
+        basis_factor_max_limit:
+          type: string
+          description: Maximum allowed value of annualized basis
+        is_quanto:
+          type: boolean
+          description: Flag which denotes whether future contract is quanto or not
+        funding_method:
+          type: string
+          description: Method used to calculate funding for given contract. e.g. Fixed or mark price
+        annualized_funding:
+          type: string
+          description: Maximum allowed value of funding, expressed as annual rate.
+        price_band:
+          type: string
+          description: he range around mark price in which trading is allowed. This number is in percentage.
+        underlying_asset:
+          $ref: '#/components/schemas/Asset'
+        quoting_asset:
+          $ref: '#/components/schemas/Asset'
+        settling_asset:
+          $ref: '#/components/schemas/Asset'
+    ArrayOfDeleteOrderRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/DeleteOrderRequest'
+    ArrayOfOrders:
+      type: array
+      items:
+        $ref: '#/components/schemas/Order'
+    BatchEditOrders:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Order id to be edited
+        size:
+          type: integer
+          format: int32
+        limit_price:
+          type: string
+        product_id:
+          type: integer
+          format: int32
+      required:
+      - id
+      - size
+      - limit_price
+      - product_id
+    EditBatchOrders:
+      type: object
+      properties:
+        product_id:
+          type: integer
+          format: int32
+        orders:
+          type: array
+          items:
+            $ref: '#/components/schemas/BatchEditOrders'
+      required:
+      - product_id
+      - orders
     Order:
       type: object
       description: An Order object
       properties:
         id:
           type: integer
-          description: Genraeted order id
-          example: 123
         user_id:
           type: integer
-          description: Client id
-          example: 453671
         size:
           type: integer
-          description: Order size
-          example: 10
         unfilled_size:
           type: integer
-          description: Order size which is not filled yet
-          example: 2
         side:
           type: string
-          description: Side for which to place order
+          description: side for which to place order
           enum:
           - buy
           - sell
-          x-enumDescriptions:
-            buy: Buy order on the product
-            sell: Sell order on the product
-          example: buy
         order_type:
           type: string
-          description: Order type - limit_order/market_order
           enum:
           - limit_order
           - market_order
-          x-enumDescriptions:
-            limit_order: Order placed at a specified limit price
-            market_order: Order executed at the best available market price
-          example: limit_order
         limit_price:
           type: string
-          description: Price level on which order must be triggered. Null for market orders.
-          example: '59000'
         stop_order_type:
           type: string
-          description: Stop order type - stop loss, take profit, or liquidation. Null when the order is not a stop order. liquidation_order is generated by the system when a position is force-closed and cannot be submitted in a create order request.
           enum:
           - stop_loss_order
-          - take_profit_order
-          - liquidation_order
-          x-enumDescriptions:
-            stop_loss_order: Order triggered when stop price is hit to limit losses
-            take_profit_order: Order triggered when take profit price is hit to lock in gains
-            liquidation_order: Order automatically generated by the system to close a position during liquidation
-          example: stop_loss_order
         stop_price:
           type: string
-          description: Stop price level for the stop order. Null when the order is not a stop order.
-          example: '55000'
-        average_fill_price:
+        close_on_trigger:
           type: string
-          description: Average price at which the order has been filled. Null for unfilled orders.
-          example: '8999.00'
-        bracket_order:
-          type: boolean
-          description: True if this is a bracket order, false otherwise.
-          example: false
-        bracket_stop_loss_price:
-          type: string
-          description: Bracket order stop loss trigger price.
-          example: '56000'
-        bracket_stop_loss_limit_price:
-          type: string
-          description: Bracket order stop loss limit price.
-          example: '57000'
-        bracket_take_profit_price:
-          type: string
-          description: Take profit trigger price for bracket order.
-          example: '61000'
-        bracket_take_profit_limit_price:
-          type: string
-          description: Bracket order take profit limit price.
-          example: '62000'
-        bracket_trail_amount:
-          type: string
-          description: Trail amount for a trailing bracket stop order.
-          example: '50'
-        trail_amount:
-          type: string
-          description: Trail amount for a trailing stop order. Null unless the order is a trailing stop order.
-          example: '50'
-        cancellation_reason:
-          type: string
-          description: Reason the order was cancelled. Null unless state is cancelled.
-          example: cancelled_by_user
-        mmp:
-          type: string
-          description: MMP level applied to the order - disabled/mmp1/mmp2/mmp3/mmp4/mmp5
-          enum:
-          - disabled
-          - mmp1
-          - mmp2
-          - mmp3
-          - mmp4
-          - mmp5
-          example: disabled
-        stop_trigger_method:
-          type: string
-          description: Stop order trigger method - mark_price/last_traded_price/spot_price
-          enum:
-          - mark_price
-          - last_traded_price
-          - spot_price
-          x-enumDescriptions:
-            mark_price: Order triggered against the mark price
-            last_traded_price: Order triggered against the last traded price
-            spot_price: Order triggered against the spot index price
-          example: last_traded_price
-        time_in_force:
-          type: string
-          description: GTC/IOC order type
-          enum:
-          - gtc
-          - ioc
-          x-enumDescriptions:
-            gtc: Good-till-cancelled; order stays open until filled or cancelled
-            ioc: Immediate-or-cancel; unfilled portion is cancelled immediately
-          example: gtc
-        updated_at:
-          type: string
-          description: Updated at unix timestamp of the order in micro seconds.
-          example: '1725865012000000'
-        paid_commission:
-          type: string
-          description: Commission paid for filled order
-          example: '0.5432'
-        commission:
-          type: string
-          description: Commission blocked for order
-          example: '0.5432'
-        reduce_only:
-          type: string
-          description: if set, will only close positions. New orders will not be placed
           enum:
           - 'false'
           - 'true'
-          x-enumDescriptions:
-            'false': Order can open or increase a position
-            'true': Order can only reduce or close an existing position
-          default: false
-          example: false
-        client_order_id:
-          type: string
-          description: custom id provided by user when creating order. Must be unique across all open orders of the user (max 32 length)
-          example: my_signal_34521712
         state:
           type: string
           description: Order Status
@@ -1372,40 +711,112 @@ components:
           - pending
           - closed
           - cancelled
-          x-enumDescriptions:
-            open: Order is active and resting in the orderbook
-            pending: Order is waiting for its trigger condition to be met
-            closed: Order has been fully filled
-            cancelled: Order was cancelled before being fully filled
-          example: open
         created_at:
           type: string
-          description: Created at unix timestamp of the order in micro seconds
-          example: '1725865012000000'
-        product_id:
-          type: integer
-          description: Product id of the ordered product
-          example: 27
-        product_symbol:
-          type: string
-          description: Product symbol of the ordered product
-          example: BTCUSD
+        product:
+          $ref: '#/components/schemas/Product'
     DeleteOrderRequest:
       type: object
       description: A delete order object
       properties:
         id:
           type: integer
-          description: use bracket trail amount if you want a trailing stop order. Required if bracket stop price is empty
-          example: 13452112
-        client_order_id:
-          type: string
-          description: client order id of the order to be cancelled. Since client order id is unique across all open orders of the user, it can be used to uniquely identify the order (max 32 length)
-          example: my_signal_34521712
         product_id:
           type: integer
-          description: product_id of the product in the order
-          example: 27
+    CreateOrderRequest:
+      type: object
+      description: A create order object
+      properties:
+        product_id:
+          type: integer
+          required: true
+        limit_price:
+          type: string
+        size:
+          type: integer
+        side:
+          type: string
+          description: side for which to place order
+          enum:
+          - buy
+          - sell
+        order_type:
+          type: string
+          enum:
+          - limit_order
+          - market_order
+        time_in_force:
+          type: string
+          enum:
+          - gtc
+          - ioc
+          required: false
+        post_only:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+        reduce_only:
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+        bracket_order:
+          deprecated: true
+          description: _DEPRECATED_
+          type: object
+          properties:
+            stop_loss_price:
+              type: string
+            take_profit_price:
+              type: string
+            trail_amount:
+              type: string
+    BracketOrder:
+      deprecated: true
+      description: __DEPRECATED__
+      type: object
+      properties:
+        stop_loss_order:
+          $ref: '#/components/schemas/Order'
+        take_profit_order:
+          $ref: '#/components/schemas/Order'
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        symbol:
+          type: string
+        precision:
+          type: integer
+    CancelAllFilterObject:
+      type: object
+      description: Cancel all request filter object
+      properties:
+        product_id:
+          type: integer
+          description: cancel all orders for particular product, cancels orders for all products if not provided
+          required: false
+        cancel_limit_orders:
+          type: string
+          description: set as true to cancel open limit orders
+          enum:
+          - 'true'
+          - 'false'
+          required: false
+        cancel_stop_orders:
+          type: string
+          description: set as true to cancel stop orders
+          enum:
+          - 'true'
+          - 'false'
+          required: false
+    ArrayOfCreateOrderRequest:
+      type: array
+      items:
+        $ref: '#/components/schemas/CreateOrderRequest'
   securitySchemes:
     api-key:
       type: apiKey
@@ -1419,6 +830,3 @@ components:
       type: apiKey
       name: timestamp
       in: header
-x-refined-from:
-- delta-exchange-swagger_v2.json
-- delta-exchange-openapi.yml

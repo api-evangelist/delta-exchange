@@ -1,0 +1,288 @@
+openapi: 3.2.0
+info:
+  title: Delta Exchange Heartbeat Management API
+  version: 1.0.0
+  contact:
+    email: support@delta.exchange
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  description: 'Operations tagged Heartbeat Management across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://api.india.delta.exchange/v2
+tags:
+- name: Heartbeat Management
+paths:
+  /heartbeat/create:
+    post:
+      tags:
+      - Heartbeat Management
+      summary: Create Heartbeat
+      operationId: createHeartbeat
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Heartbeat created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/HeartbeatResponse'
+        '400':
+          description: Returns if heartbeat couldnt be created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateHeartbeat'
+        description: heartbeat creation details
+        required: true
+    servers:
+    - url: https://api.india.delta.exchange/v2
+  /heartbeat:
+    post:
+      tags:
+      - Heartbeat Management
+      summary: Send Heartbeat Acknowledgment
+      operationId: sendHeartbeat
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      responses:
+        '200':
+          description: Heartbeat acknowledged successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/HeartbeatAckResponse'
+        '400':
+          description: Returns if heartbeat acknowledgment failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartbeatAck'
+        description: heartbeat acknowledgment details
+        required: true
+    get:
+      tags:
+      - Heartbeat Management
+      summary: Get Heartbeats
+      operationId: getHeartbeats
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      parameters:
+      - in: query
+        name: user_id
+        description: User ID
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: heartbeat_id
+        description: Specific heartbeat ID to retrieve
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of active heartbeats
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/ApiSuccessResponse'
+                - type: object
+                  properties:
+                    result:
+                      $ref: '#/components/schemas/ArrayOfHeartbeats'
+        '400':
+          description: Returns if heartbeats couldnt be retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+    servers:
+    - url: https://api.india.delta.exchange/v2
+components:
+  schemas:
+    HeartbeatAck:
+      type: object
+      description: Heartbeat Acknowledgment Request Object
+      properties:
+        heartbeat_id:
+          type: string
+          description: Heartbeat identifier
+        ttl:
+          type: integer
+          description: Time to live in milliseconds
+      required:
+      - heartbeat_id
+      - ttl
+    ApiErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        error:
+          type: object
+    ApiSuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: true
+    HeartbeatConfig:
+      type: object
+      description: Heartbeat Configuration Object
+      properties:
+        action:
+          type: string
+          enum:
+          - cancel_orders
+          - spreads
+          x-enumDescriptions:
+            cancel_orders: Cancel the user's open orders when the heartbeat goes unhealthy
+            spreads: Widen quote spreads when the heartbeat goes unhealthy
+          description: Action to take when heartbeat expires
+        unhealthy_count:
+          type: integer
+          description: Number of unhealthy heartbeats before action
+        tag:
+          type: string
+          description: Tag for the action (e.g., 'mmp')
+      required:
+      - action
+      - unhealthy_count
+    ArrayOfHeartbeats:
+      type: array
+      items:
+        $ref: '#/components/schemas/Heartbeat'
+    Heartbeat:
+      type: object
+      description: Heartbeat Object
+      properties:
+        heartbeat_id:
+          type: string
+        impact:
+          type: string
+        contract_types:
+          type: array
+          items:
+            type: string
+        underlying_assets:
+          type: array
+          items:
+            type: string
+        product_symbols:
+          type: array
+          items:
+            type: string
+        config:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeartbeatConfig'
+        status:
+          type: string
+        last_ack:
+          type: string
+        next_ack_required_by:
+          type: string
+    HeartbeatAckResponse:
+      type: object
+      description: Heartbeat Acknowledgment Response Object
+      properties:
+        process_enabled:
+          type: string
+          description: Acknowledgement status (true/false)
+        heartbeat_timestamp:
+          type: string
+          description: Expiry timestamp after which actions will be triggered
+    HeartbeatResponse:
+      type: object
+      description: Heartbeat Response Object
+      properties:
+        heartbeat_id:
+          type: string
+        status:
+          type: string
+    CreateHeartbeat:
+      type: object
+      description: Create Heartbeat Request Object
+      properties:
+        heartbeat_id:
+          type: string
+          description: Unique identifier for the heartbeat
+        impact:
+          type: string
+          enum:
+          - low
+          - medium
+          - high
+          x-enumDescriptions:
+            low: Low-impact heartbeat; missed beats trigger minimal protective action
+            medium: Medium-impact heartbeat; missed beats trigger standard protective action
+            high: High-impact heartbeat; missed beats trigger the strongest protective action
+          description: Impact level
+        contract_types:
+          type: array
+          description: Array of contract types to monitor
+          items:
+            type: string
+        underlying_assets:
+          type: array
+          description: Array of underlying assets to monitor
+          items:
+            type: string
+        product_symbols:
+          type: array
+          description: Array of specific product symbols to monitor
+          items:
+            type: string
+        config:
+          type: array
+          description: Array of action configurations
+          items:
+            $ref: '#/components/schemas/HeartbeatConfig'
+      required:
+      - heartbeat_id
+      - impact
+      - config
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
+x-refined-from:
+- delta-exchange-swagger_v2.json
+- delta-exchange-openapi.yml

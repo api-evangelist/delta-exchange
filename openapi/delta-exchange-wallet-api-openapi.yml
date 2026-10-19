@@ -1,13 +1,15 @@
 openapi: 3.2.0
 info:
-  title: Delta Exchange Wallet API
+  description: '## REST API for Delta Exchange
+
+    Find out more on https://delta.exchange'
   version: 1.0.0
+  title: Delta Exchange Wallet API
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
   contact:
     email: support@delta.exchange
-  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
-  description: 'Operations tagged Wallet across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
-- url: https://api.india.delta.exchange/v2
+- url: https://api.india.delta.exchange/
 tags:
 - name: Wallet
   description: Get balances, Get transaction history
@@ -16,7 +18,7 @@ paths:
     get:
       tags:
       - Wallet
-      operationId: getBalances
+      operationId: getWalletBalances
       summary: Get Wallet Balances
       security:
       - api-key: []
@@ -28,197 +30,371 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                $ref: '#/components/schemas/WalletPayload'
-    servers:
-    - url: https://api.india.delta.exchange/v2
+                $ref: '#/components/schemas/ArrayOfWallets'
   /wallet/transactions:
     get:
       tags:
       - Wallet
       summary: Get Wallet transactions
-      operationId: getTransactions
+      operationId: getWalletTransactions
       security:
       - api-key: []
         signature: []
         timestamp: []
       parameters:
       - in: query
-        name: asset_ids
-        description: comma separated list of asset_ids for which to get txns logs
+        name: asset_id
+        description: asset_id for that particular Wallet
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: product_id
+        description: product_id filter for the transaction query
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: transaction_type
+        description: transaction_type filter for the transaction query
+        required: false
         schema:
           type: integer
       - in: query
         name: start_time
-        description: from time in micro-seconds in epoc
+        description: Start time for the transaction query
+        required: false
         schema:
           type: integer
       - in: query
         name: end_time
-        description: from time in micro-seconds in epoc
+        description: End time for the transaction query
+        required: false
         schema:
           type: integer
       - in: query
-        name: after
-        description: after cursor for pagination
+        name: page_num
+        description: page number for pagination
         schema:
-          type: string
-      - in: query
-        name: before
-        description: before cursor for pagination
-        schema:
-          type: string
+          type: integer
+          default: 1
       - in: query
         name: page_size
-        description: number of records per page
+        description: page size for pagination
         schema:
           type: integer
-          default: 10
-      - in: query
-        name: transaction_types
-        description: transaction types to retrieve
-        schema:
-          $ref: '#/components/schemas/TransactionTypes'
+          default: 20
       responses:
         '200':
-          description: list of [Wallet transactions](#tocStransaction)
+          description: list of transactions for that wallet
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/ArrayOfTransactions'
-                    meta:
-                      $ref: '#/components/schemas/PaginationMeta'
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /wallet/transactions/download:
+                $ref: '#/components/schemas/ArrayOfTransactions'
+  /wallet/download/transactions:
     get:
       tags:
       - Wallet
       summary: Download Wallet transactions
-      operationId: downloadTransactions
+      operationId: downloadWalletTransactions
       security:
       - api-key: []
         signature: []
         timestamp: []
       parameters:
       - in: query
-        name: asset_ids
-        description: comma separated list of asset_ids
+        name: asset_id
+        description: asset_id for that particular Wallet
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: product_id
+        description: product_id filter for the transaction query
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: transaction_type
+        description: transaction_type filter for the transaction query
+        required: false
         schema:
           type: integer
       - in: query
         name: start_time
-        description: from time in micro-seconds in epoc
+        description: Start time for the transaction query
+        required: false
         schema:
           type: integer
       - in: query
         name: end_time
-        description: from time in micro-seconds in epoc
+        description: End time for the transaction query
+        required: false
         schema:
           type: integer
-      - in: query
-        name: after
-        description: after cursor for pagination
-        schema:
-          type: string
-      - in: query
-        name: before
-        description: before cursor for pagination
-        schema:
-          type: string
-      - in: query
-        name: page_size
-        description: number of records per page
-        schema:
-          type: integer
-          default: 10
       responses:
         '200':
           description: csv of transactions for that wallet
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /wallets/sub_account_balance_transfer:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfTransactions'
+  /wallet/withdrawals:
     post:
       tags:
       - Wallet
-      summary: Request asset transfer
-      description: This api transfers asset from one subaccount to another subaccount or to the main/parent account. Please ensure that the subaccounts involved in the transfer should belong to the same parent account. Requests to transfer assets across subaccounts that belong to different parent accounts will fail. Please make sure that the api key used to make this api request belongs to the main/parent account.
-      operationId: assetTransfer
+      summary: Raise withdrawals request
+      operationId: raiseWithdrawalRequest
       security:
       - api-key: []
         signature: []
         timestamp: []
       responses:
         '200':
-          description: Returns success message
+          description: returns the WithdrawalsResponse object
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result: {}
+                $ref: '#/components/schemas/WithdrawalsResponse'
         '400':
-          description: Returns error code
+          description: Returns error if Withdrawal limit exceeded, ammount or address is missing or invalid
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - WithdrawalLimitExceeded
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AssetTransferSubaccountReq'
+              type: object
+              required:
+              - amount
+              - address
+              properties:
+                release_promo_credit:
+                  type: string
+                amount:
+                  type: string
+                address:
+                  type: string
         required: true
-    servers:
-    - url: https://api.india.delta.exchange/v2
-  /wallets/sub_accounts_transfer_history:
-    get:
+  /wallet/withdrawals/cancel:
+    post:
       tags:
       - Wallet
-      summary: Request subaccount balance transfer history
-      description: This api returns the wallet balance transfers for subaccounts belonging to the parent/main account of an api user. Make sure you are calling this api from the main account. If no subaccount is mentioned in the request, data for all the subacounts will be returned. Use page size to get more entries in a single request.
-      operationId: SubaccountTransferHistory
+      summary: Cancel withdrawals request
+      operationId: cancelWithdrawalRequest
       security:
       - api-key: []
         signature: []
         timestamp: []
       responses:
         '200':
-          description: Returns success message
+          description: returns success true or false
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/ArrayOfSubaccountTransferLog'
-                    meta:
-                      $ref: '#/components/schemas/PaginationMeta'
+                type: object
+                properties:
+                  success:
+                    type: boolean
         '400':
-          description: Returns error code
+          description: Returns error if Withdrawal Withdrawal Already Processed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiErrorResponse'
+                type: object
+                properties:
+                  error:
+                    type: string
+                    enum:
+                    - WithdrawalAlreadyProcessed
+                  message:
+                    type: string
+                    description: A more verbose error message
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SubaccountTransferHistory'
+              type: object
+              required:
+              - withdrawal_id
+              properties:
+                withdrawal_id:
+                  type: integer
         required: true
-    servers:
-    - url: https://api.india.delta.exchange/v2
 components:
   schemas:
+    Wallet:
+      type: object
+      properties:
+        balance:
+          type: string
+          description: Total wallet balance
+        order_margin:
+          type: string
+          description: Margin blocked in open orders
+        position_margin:
+          type: string
+          description: Margin blocked in open positions
+        commission:
+          type: string
+          description: Commissions blocked in open orders and open positions
+        available_balance:
+          type: string
+          description: Amount available for withdrawals
+        asset:
+          $ref: '#/components/schemas/Asset'
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id of a product or a contract
+        symbol:
+          type: string
+          description: symbol of a product or a contract e.g. LINKBTC, XRPUSDQ
+        description:
+          type: string
+          description: description of a product or a contract
+        created_at:
+          type: string
+          description: product/contract creation date and time
+        updated_at:
+          type: string
+          description: product/contract update date and time
+        settlement_time:
+          type: string
+          description: settlement Timestamp of futures contract
+        product_type:
+          type: string
+          enum:
+          - future
+          - inverse_future
+          description: contract type 'future' or 'inverse_future'
+        pricing_source:
+          type: string
+          description: source and method of contract pricing
+        impact_size:
+          type: integer
+          description: size of a typical trade. Used in the computation of mark price
+        initial_margin:
+          type: integer
+          description: The amount required to enter into a new position
+        maintenance_margin:
+          type: string
+          description: 'The amount necessary when a loss on a futures position requires you to allocate more funds to return the margin to the initial margin level. '
+        contract_value:
+          type: string
+          description: The notional value of a futures contract is simply the spot price of the asset multiplied by the amount of the asset specified in the contract
+        contract_unit_currency:
+          type: string
+          description: This is the unit of  1 contract, for vanilla futures, its underlying asset. for inverse, it is settling asset. for quanto, its settling asset / quoting asset
+        tick_size:
+          type: string
+          description: The minimum gap between 2 consecutive prices.
+        trading_status:
+          type: string
+          enum:
+          - operational
+          - disrupted_cancel_only
+          - disrupted_post_only
+          description: 'trading status of the contract e.g. ''operational'',''disrupted_cancel_only'' or ''disrupted_post_only'' '
+        max_leverage_notional:
+          type: string
+          description: maximum notional position size (in settling asset terms) that can be acquired at highest allowed leverage for a given contract.
+        default_leverage:
+          type: string
+          description: default leverage
+        initial_margin_scaling_factor:
+          type: string
+        maintenance_margin_scaling_factor:
+          type: string
+        commission_rate:
+          type: string
+          description: rate at which commission fee will be calculated for a trade in given contract
+        maker_commission_rate:
+          type: string
+          description: rate at which maker rebate will be calculated
+        liquidation_penalty_factor:
+          type: string
+          description: 'Determines liquidation charge as per the following formula: liquidation_penalty_factor * minimum maintenance margin'
+        contract_type:
+          type: string
+          description: ' Type of contracts e.g. futures, perpetual futures, '
+        position_size_limit:
+          type: integer
+          description: Maximum size of contracts in a single order can be placed
+        basis_factor_max_limit:
+          type: string
+          description: Maximum allowed value of annualized basis
+        is_quanto:
+          type: boolean
+          description: Flag which denotes whether future contract is quanto or not
+        funding_method:
+          type: string
+          description: Method used to calculate funding for given contract. e.g. Fixed or mark price
+        annualized_funding:
+          type: string
+          description: Maximum allowed value of funding, expressed as annual rate.
+        price_band:
+          type: string
+          description: he range around mark price in which trading is allowed. This number is in percentage.
+        underlying_asset:
+          $ref: '#/components/schemas/Asset'
+        quoting_asset:
+          $ref: '#/components/schemas/Asset'
+        settling_asset:
+          $ref: '#/components/schemas/Asset'
+    WithdrawalsResponse:
+      type: object
+      properties:
+        address:
+          type: string
+          description: BTC Destination Address
+        amount:
+          type: string
+          description: Amount to be Withdrawn
+        fee:
+          type: string
+          description: Withdrawal Fee
+        id:
+          type: integer
+          format: int64
+          description: Trasaction id
+        state:
+          type: string
+          description: state of withdrawal request
+        transaction_meta:
+          type: string
+          description: Amount to be Withdrawn
+        user_id:
+          type: integer
+          format: int64
+          description: User id
+    ArrayOfTransactions:
+      type: array
+      items:
+        $ref: '#/components/schemas/Transaction'
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        symbol:
+          type: string
+        precision:
+          type: integer
     Transaction:
       type: object
       properties:
@@ -231,274 +407,28 @@ components:
           type: string
           description: net wallet balance after this transaction
         transaction_type:
-          $ref: '#/components/schemas/TransactionTypes'
-        meta_data:
-          type: object
-        product_id:
-          type: integer
-        asset_id:
-          type: integer
-        asset_symbol:
-          type: integer
-        created_at:
-          type: string
-    WalletPayload:
-      type: object
-      properties:
-        meta:
-          $ref: '#/components/schemas/WalletMetaData'
-        result:
-          $ref: '#/components/schemas/ArrayOfWallets'
-        success:
-          type: boolean
-          default: true
-    PaginationMeta:
-      type: object
-      properties:
-        after:
-          type: string
-          description: after cursor for pagination; becomes null if page after the current one does not exist
-          example: g3QAAAACZAAKY3JlYXRlZF9hdHQAAAAN
-        before:
-          type: string
-          description: before cursor for pagination; becomes null if page before the current one does not exist
-          example: a2PQRSACZAAKY3JlYXRlZF3fnqHBBBNZL
-    SubaccountTransferLog:
-      type: object
-      properties:
-        transferrer_user_id:
-          type: string
-          description: User id of the account debited with the asset.
-        transferee_user_id:
-          type: string
-          description: User id of the account credited with the asset.
-        asset_symbol:
-          type: string
-          description: Asset symbol transferred.
-        amount:
-          type: big_decimal
-          description: Amount transferred.
-        created_at:
-          type: string
-          description: transfer creation date and time
-        transferee_user:
-          type: object
-          description: User details
-        transferrer_user:
-          type: object
-          description: User details
-    Wallet:
-      type: object
-      description: Wallet Data for each asset.
-      properties:
-        asset_id:
-          type: integer
-          description: Id for assets like BTC
-        asset_symbol:
-          type: string
-          description: Symbol for assets like BTC
-        available_balance:
-          type: string
-          description: Balance available for trading
-        available_balance_for_robo:
-          type: string
-          description: Balance available for robo trading
-        balance:
-          type: string
-          description: Total wallet balance
-        blocked_margin:
-          type: string
-          description: Total blocked margin including commissions for all modes
-        commission:
-          type: string
-          description: Commissions blocked in Isolated Mode
-        cross_asset_liability:
-          type: string
-          description: Asset liability in Cross margin mode
-        cross_commission:
-          type: string
-          description: Commision blocked in Cross margin mode
-        cross_locked_collateral:
-          type: string
-          description: collateral blocked in Cross margin mode
-        cross_order_margin:
-          type: string
-          description: margin blocked for open orders in Cross margin mode
-        cross_position_margin:
-          type: string
-          description: margin blocked for open positions in Cross margin mode
-        id:
-          type: integer
-          description: Wallet Id
-        interest_credit:
-          type: string
-          description: Total interest credited
-        order_margin:
-          type: string
-          description: margin blocked for open positions in isolated mode
-        pending_referral_bonus:
-          type: string
-          description: Pending referral bonus
-        pending_trading_fee_credit:
-          type: string
-          description: Credit of trading fee pending
-        portfolio_margin:
-          type: string
-          description: Total margin blocked including commissions in portfolio margin mode
-        position_margin:
-          type: string
-          description: Margin blocked in open positions in isolated mode
-        trading_fee_credit:
-          type: string
-          description: Credit of trading fee
-        unvested_amount:
-          type: string
-          description: Amount currently unvested
-        user_id:
-          type: integer
-          description: User Id linked to this wallet
-    TransactionTypes:
-      type: string
-      properties:
-        transaction_type:
           type: string
           enum:
-          - cashflow
+          - pnl
           - deposit
           - withdrawal
           - commission
           - conversion
-          - funding
-          - settlement
-          - liquidation_fee
-          - spot_trade
+          - perpetual_futures_funding
           - withdrawal_cancellation
           - referral_bonus
-          - sub_account_transfer
           - commission_rebate
           - promo_credit
-          - trading_credits
-          - trading_credits_forfeited
-          - trading_credits_paid
-          - trading_fee_credits_paid_liquidation_fee
-          - trading_credits_reverted
-          - interest_credit
-          - external_deposit
-          - credit_line
-          - trading_competition
-          - fund_deposit
-          - fund_withdrawal
-          - fund_wallet_deposit
-          - fund_wallet_withdrawal
-          - fund_reward
-          - trade_farming_reward
-          - interest_credit
-          - revert
-          - raf_bonus
-          - fill_appropriation
-          - incident_compensation
-          x-enumDescriptions:
-            cashflow: Generic cash credit or debit on the wallet
-            deposit: Funds deposited into the wallet
-            withdrawal: Funds withdrawn from the wallet
-            commission: Trading commission charged on a fill
-            conversion: Currency or asset conversion entry
-            funding: Perpetual funding payment exchanged between long and short
-            settlement: Wallet entry generated at contract settlement
-            liquidation_fee: Fee charged when a position is liquidated
-            spot_trade: Wallet entry from a spot trade
-            withdrawal_cancellation: Reversal of a previously requested withdrawal
-            referral_bonus: Bonus credited from the referral program
-            sub_account_transfer: Transfer between a main account and a subaccount
-            commission_rebate: Rebate paid back on previously charged commission
-            promo_credit: Promotional credit added to the wallet
-            trading_credits: Trading credits granted to the user
-            trading_credits_forfeited: Trading credits forfeited (e.g. on expiry)
-            trading_credits_paid: Trading credits applied toward trading fees
-            trading_fee_credits_paid_liquidation_fee: Trading credits applied toward a liquidation fee
-            trading_credits_reverted: Reversal of previously applied trading credits
-            interest_credit: Interest credited on the wallet balance
-            external_deposit: Deposit from an external/off-exchange source
-            credit_line: Credit line adjustment on the wallet
-            trading_competition: Wallet entry related to a trading competition
-            fund_deposit: Deposit into a managed fund
-            fund_withdrawal: Withdrawal from a managed fund
-            fund_wallet_deposit: Deposit into the fund wallet
-            fund_wallet_withdrawal: Withdrawal from the fund wallet
-            fund_reward: Reward credited from a managed fund
-            trade_farming_reward: Reward credited from the trade farming program
-            revert: Reversal of a prior wallet transaction
-            raf_bonus: Refer-a-friend bonus credited to the wallet
-            fill_appropriation: Adjustment from appropriation of a fill
-            incident_compensation: Compensation credited due to an incident
-    ApiErrorResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          default: false
-        error:
+        meta_data:
           type: object
-    ApiSuccessResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          default: true
-    SubaccountTransferHistory:
-      type: object
-      properties:
-        subaccount_user_id:
+        product:
+          $ref: '#/components/schemas/Product'
+        created_at:
           type: string
-          description: subaccount user id
-        before:
-          type: string
-          description: before cursor for pagination
-        after:
-          type: string
-          description: after cursor for pagination
-        page_size:
-          type: big_decimal
-          description: records per page
-          default: 10
     ArrayOfWallets:
       type: array
-      description: Array of wallet for every asset
       items:
         $ref: '#/components/schemas/Wallet'
-    ArrayOfSubaccountTransferLog:
-      type: array
-      items:
-        $ref: '#/components/schemas/SubaccountTransferLog'
-    AssetTransferSubaccountReq:
-      type: object
-      properties:
-        transferrer_user_id:
-          type: string
-          description: Debit account
-        transferee_user_id:
-          type: string
-          description: Credit account
-        asset_symbol:
-          type: string
-          description: Asset to transfer
-        amount:
-          type: big_decimal
-          description: Amount to transfer. Only postive values allowed.
-    ArrayOfTransactions:
-      type: array
-      items:
-        $ref: '#/components/schemas/Transaction'
-    WalletMetaData:
-      type: object
-      description: Meta data for robo trading
-      properties:
-        net_equity:
-          description: Net equity for robo trading
-          type: string
-        robo_trading_equity:
-          description: trading equity for robo trading
-          type: string
   securitySchemes:
     api-key:
       type: apiKey
@@ -512,6 +442,3 @@ components:
       type: apiKey
       name: timestamp
       in: header
-x-refined-from:
-- delta-exchange-swagger_v2.json
-- delta-exchange-openapi.yml

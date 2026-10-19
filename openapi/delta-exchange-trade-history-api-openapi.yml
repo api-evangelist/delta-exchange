@@ -1,0 +1,305 @@
+openapi: 3.2.0
+info:
+  description: '## REST API for Delta Exchange
+
+    Find out more on https://delta.exchange'
+  version: 1.0.0
+  title: Delta Exchange Trade History API
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  contact:
+    email: support@delta.exchange
+servers:
+- url: https://api.india.delta.exchange/
+tags:
+- name: Trade History
+  description: Get Orders History, Get Fill History
+paths:
+  /orders/history:
+    get:
+      tags:
+      - Trade History
+      summary: Get order history (cancelled and closed)
+      operationId: getOrderHistory
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      parameters:
+      - in: query
+        name: page_num
+        description: page number for pagination
+        schema:
+          type: integer
+          default: 1
+      - in: query
+        name: page_size
+        description: page size for pagination
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfOrders'
+  /fills:
+    get:
+      tags:
+      - Trade History
+      summary: Get fills
+      operationId: getFills
+      security:
+      - api-key: []
+        signature: []
+        timestamp: []
+      parameters:
+      - in: query
+        name: product_id
+        description: product id for fill query
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: start_time
+        description: Start time for the fill query
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: end_time
+        description: End time for the fill query
+        required: false
+        schema:
+          type: integer
+      - in: query
+        name: page_num
+        description: page number for pagination
+        schema:
+          type: integer
+          default: 1
+      - in: query
+        name: page_size
+        description: page size for pagination
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: List of Fills
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfFills'
+components:
+  schemas:
+    ArrayOfFills:
+      type: array
+      items:
+        $ref: '#/components/schemas/Fill'
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id of a product or a contract
+        symbol:
+          type: string
+          description: symbol of a product or a contract e.g. LINKBTC, XRPUSDQ
+        description:
+          type: string
+          description: description of a product or a contract
+        created_at:
+          type: string
+          description: product/contract creation date and time
+        updated_at:
+          type: string
+          description: product/contract update date and time
+        settlement_time:
+          type: string
+          description: settlement Timestamp of futures contract
+        product_type:
+          type: string
+          enum:
+          - future
+          - inverse_future
+          description: contract type 'future' or 'inverse_future'
+        pricing_source:
+          type: string
+          description: source and method of contract pricing
+        impact_size:
+          type: integer
+          description: size of a typical trade. Used in the computation of mark price
+        initial_margin:
+          type: integer
+          description: The amount required to enter into a new position
+        maintenance_margin:
+          type: string
+          description: 'The amount necessary when a loss on a futures position requires you to allocate more funds to return the margin to the initial margin level. '
+        contract_value:
+          type: string
+          description: The notional value of a futures contract is simply the spot price of the asset multiplied by the amount of the asset specified in the contract
+        contract_unit_currency:
+          type: string
+          description: This is the unit of  1 contract, for vanilla futures, its underlying asset. for inverse, it is settling asset. for quanto, its settling asset / quoting asset
+        tick_size:
+          type: string
+          description: The minimum gap between 2 consecutive prices.
+        trading_status:
+          type: string
+          enum:
+          - operational
+          - disrupted_cancel_only
+          - disrupted_post_only
+          description: 'trading status of the contract e.g. ''operational'',''disrupted_cancel_only'' or ''disrupted_post_only'' '
+        max_leverage_notional:
+          type: string
+          description: maximum notional position size (in settling asset terms) that can be acquired at highest allowed leverage for a given contract.
+        default_leverage:
+          type: string
+          description: default leverage
+        initial_margin_scaling_factor:
+          type: string
+        maintenance_margin_scaling_factor:
+          type: string
+        commission_rate:
+          type: string
+          description: rate at which commission fee will be calculated for a trade in given contract
+        maker_commission_rate:
+          type: string
+          description: rate at which maker rebate will be calculated
+        liquidation_penalty_factor:
+          type: string
+          description: 'Determines liquidation charge as per the following formula: liquidation_penalty_factor * minimum maintenance margin'
+        contract_type:
+          type: string
+          description: ' Type of contracts e.g. futures, perpetual futures, '
+        position_size_limit:
+          type: integer
+          description: Maximum size of contracts in a single order can be placed
+        basis_factor_max_limit:
+          type: string
+          description: Maximum allowed value of annualized basis
+        is_quanto:
+          type: boolean
+          description: Flag which denotes whether future contract is quanto or not
+        funding_method:
+          type: string
+          description: Method used to calculate funding for given contract. e.g. Fixed or mark price
+        annualized_funding:
+          type: string
+          description: Maximum allowed value of funding, expressed as annual rate.
+        price_band:
+          type: string
+          description: he range around mark price in which trading is allowed. This number is in percentage.
+        underlying_asset:
+          $ref: '#/components/schemas/Asset'
+        quoting_asset:
+          $ref: '#/components/schemas/Asset'
+        settling_asset:
+          $ref: '#/components/schemas/Asset'
+    ArrayOfOrders:
+      type: array
+      items:
+        $ref: '#/components/schemas/Order'
+    Order:
+      type: object
+      description: An Order object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        size:
+          type: integer
+        unfilled_size:
+          type: integer
+        side:
+          type: string
+          description: side for which to place order
+          enum:
+          - buy
+          - sell
+        order_type:
+          type: string
+          enum:
+          - limit_order
+          - market_order
+        limit_price:
+          type: string
+        stop_order_type:
+          type: string
+          enum:
+          - stop_loss_order
+        stop_price:
+          type: string
+        close_on_trigger:
+          type: string
+          enum:
+          - 'false'
+          - 'true'
+        state:
+          type: string
+          description: Order Status
+          enum:
+          - open
+          - pending
+          - closed
+          - cancelled
+        created_at:
+          type: string
+        product:
+          $ref: '#/components/schemas/Product'
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        symbol:
+          type: string
+        precision:
+          type: integer
+    Fill:
+      type: object
+      description: A fill object
+      properties:
+        id:
+          type: integer
+        size:
+          type: integer
+        side:
+          type: integer
+          enum:
+          - buy
+          - sell
+        price:
+          type: string
+          description: Price at which the fill happened, BigDecimal sent as string
+        role:
+          type: string
+          enum:
+          - taker
+          - maker
+        commission:
+          type: string
+          description: Commission paid on this fill, negative value means commission was earned because of maker role
+        created_at:
+          type: string
+        product:
+          $ref: '#/components/schemas/Product'
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header

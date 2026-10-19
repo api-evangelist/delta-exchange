@@ -1,57 +1,27 @@
 {
   "provider": "delta-exchange",
   "sources": [
-    "_original/delta-exchange-swagger_v2.json",
-    "delta-exchange-openapi.yml"
+    "_original/delta-exchange-openapi.json"
   ],
   "outputs": [
-    "delta-exchange-account-api-openapi.yml",
     "delta-exchange-assets-api-openapi.yml",
     "delta-exchange-heartbeat-management-api-openapi.yml",
-    "delta-exchange-historical-ohlc-candles-sparklines-api-openapi.yml",
-    "delta-exchange-indices-api-openapi.yml",
-    "delta-exchange-mmp-api-openapi.yml",
+    "delta-exchange-ohlc-candles-api-openapi.yml",
     "delta-exchange-orderbook-api-openapi.yml",
     "delta-exchange-orders-api-openapi.yml",
     "delta-exchange-positions-api-openapi.yml",
     "delta-exchange-products-api-openapi.yml",
-    "delta-exchange-settlement-prices-api-openapi.yml",
-    "delta-exchange-stats-api-openapi.yml",
-    "delta-exchange-tradehistory-api-openapi.yml",
-    "delta-exchange-trades-api-openapi.yml",
+    "delta-exchange-trade-history-api-openapi.yml",
     "delta-exchange-wallet-api-openapi.yml"
   ],
-  "archived": [
-    "archived openapi/delta-exchange-openapi.yml"
-  ],
+  "archived": [],
   "errors": [],
   "warnings": [],
   "notes": [
     "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
-    "delta-exchange-swagger_v2.json: upgraded swagger 2.0 -> OpenAPI 3.2.0",
-    "delta-exchange-swagger_v2.json: declared missing tag: Heartbeat Management",
-    "delta-exchange-swagger_v2.json: declared missing tag: Historical OHLC Candles/Sparklines",
-    "delta-exchange-swagger_v2.json: declared missing tag: Settlement Prices",
-    "delta-exchange-openapi.yml: upgraded swagger 2.0 -> OpenAPI 3.2.0",
-    "delta-exchange-openapi.yml: declared missing tag: Heartbeat Management",
-    "delta-exchange-openapi.yml: declared missing tag: Historical OHLC Candles/Sparklines",
-    "delta-exchange-openapi.yml: declared missing tag: Settlement Prices",
-    "tag 'Account' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Assets' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Heartbeat Management' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Historical OHLC Candles/Sparklines' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Indices' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'MMP' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Orderbook' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Orders' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Positions' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Products' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Settlement Prices' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Stats' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'TradeHistory' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Trades' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "tag 'Wallet' spans 2 source specs (delta-exchange-swagger_v2.json, delta-exchange-openapi.yml): per-path servers applied",
-    "apis.yml register: written (+15 apis, 16 total)"
+    "delta-exchange-openapi.json: upgraded swagger 2.0 -> OpenAPI 3.2.0",
+    "delta-exchange-openapi.json: declared missing tag: Heartbeat Management",
+    "apis.yml register: written (+2 apis, 10 total)"
   ],
   "skipped": []
 }

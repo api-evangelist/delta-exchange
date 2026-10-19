@@ -1,18 +1,20 @@
 openapi: 3.2.0
 info:
-  title: Delta Exchange Orderbook API
+  description: '## REST API for Delta Exchange
+
+    Find out more on https://delta.exchange'
   version: 1.0.0
+  title: Delta Exchange Orderbook API
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
   contact:
     email: support@delta.exchange
-  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
-  description: 'Operations tagged Orderbook across 2 of this provider''s published API definitions: delta-exchange-swagger_v2.json, delta-exchange-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
-- url: https://api.india.delta.exchange/v2
+- url: https://api.india.delta.exchange/
 tags:
 - name: Orderbook
   description: L2Orderbook
 paths:
-  /l2orderbook/{symbol}:
+  /orderbook/{product_id}/l2:
     get:
       tags:
       - Orderbook
@@ -20,10 +22,10 @@ paths:
       summary: Get L2 orderbook
       parameters:
       - in: path
-        name: symbol
+        name: product_id
         required: true
         schema:
-          type: string
+          type: integer
       - in: query
         name: depth
         description: number of levels on each side
@@ -35,67 +37,53 @@ paths:
           content:
             application/json:
               schema:
-                allOf:
-                - $ref: '#/components/schemas/ApiSuccessResponse'
-                - type: object
-                  properties:
-                    result:
-                      $ref: '#/components/schemas/L2Orderbook'
-    servers:
-    - url: https://api.india.delta.exchange/v2
+                $ref: '#/components/schemas/L2Orderbook'
 components:
   schemas:
-    ApiSuccessResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-          default: true
     L2Orderbook:
       type: object
       description: L2 orderbook
       properties:
-        buy:
+        buy_book:
           type: array
           items:
             type: object
             properties:
-              depth:
-                type: string
-                description: sum of size till that price level
               price:
                 type: string
               size:
                 type: integer
-                description: for derivatives -> number of contracts, for spot -> amount in underlying
-        last_updated_at:
-          type: integer
-        sell:
+        sell_book:
           type: array
           items:
             type: object
             properties:
-              depth:
-                type: string
-                description: sum of size till that price level
               price:
                 type: string
               size:
                 type: integer
-                description: for derivatives -> number of contracts, for spot -> amount in underlying
-        symbol:
+        recent_trades:
+          type: array
+          items:
+            type: object
+            properties:
+              side:
+                type: string
+                enum:
+                - buy
+                - sell
+              size:
+                type: integer
+              price:
+                type: string
+              timestamp:
+                type: integer
+        spot_price:
           type: string
-      example:
-        buy:
-        - depth: '983'
-          price: '9187.5'
-          size: 205640
-        last_updated_at: 1654589595784000
-        sell:
-        - depth: '1185'
-          price: '9188.0'
-          size: 113752
-        symbol: BTCUSD
+        mark_price:
+          type: string
+        product_id:
+          type: integer
   securitySchemes:
     api-key:
       type: apiKey
@@ -109,6 +97,3 @@ components:
       type: apiKey
       name: timestamp
       in: header
-x-refined-from:
-- delta-exchange-swagger_v2.json
-- delta-exchange-openapi.yml

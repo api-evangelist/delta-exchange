@@ -1,0 +1,116 @@
+openapi: 3.2.0
+info:
+  description: '## REST API for Delta Exchange
+
+    Find out more on https://delta.exchange'
+  version: 1.0.0
+  title: Delta Exchange OHLC Candles API
+  termsOfService: https://docs.google.com/document/d/e/2PACX-1vSDARn3b_VlmGZjJjlROm0MFpxX6KoLzVrqPZLSD4rh7sBhpP6kDP8WMSgUlaitwjCBUBd3-fV-MDId/pub
+  contact:
+    email: support@delta.exchange
+servers:
+- url: https://api.india.delta.exchange/
+tags:
+- name: OHLC Candles
+paths:
+  /chart/history:
+    get:
+      tags:
+      - OHLC Candles
+      summary: Get OHLC candles
+      operationId: getCandles
+      parameters:
+      - in: query
+        name: symbol
+        description: Symbol should be anyone of following  1. product symbol to get OHLC for given product e.g **BTCUSD** 2. Spot index symbol to get spot index price. e.g. **.DEXBTUSD** 3. Mark and symbol to get mark price OHLC data e.g. **MARK:BTCUSD** 4. Funding and product symbol to get Funding data for given product e.g. **FUNDING:BTCUSD**
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: from
+        description: start time for the interval ( in seconds )
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: to
+        description: end time for the interval ( in seconds )
+        required: true
+        schema:
+          type: integer
+      - in: query
+        name: resolution
+        description: resolution for the candles
+        required: true
+        schema:
+          type: string
+          enum:
+          - '1'
+          - '3'
+          - '5'
+          - '15'
+          - '30'
+          - '60'
+          - '120'
+          - '240'
+          - '360'
+          - D
+          - 7D
+          - 30D
+          - 1W
+          - 2W
+      responses:
+        '200':
+          description: OHLC candles
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OHLCData'
+components:
+  schemas:
+    OHLCData:
+      type: object
+      properties:
+        t:
+          type: array
+          description: array of timestamps for which candles are returned
+          items:
+            type: integer
+        o:
+          type: array
+          description: open prices for candles
+          items:
+            type: string
+        h:
+          type: array
+          description: high prices for candles
+          items:
+            type: string
+        l:
+          type: array
+          description: low prices for candles
+          items:
+            type: string
+        c:
+          type: array
+          description: close prices for candles
+          items:
+            type: string
+        v:
+          type: array
+          description: volumes for candles
+          items:
+            type: integer
+  securitySchemes:
+    api-key:
+      type: apiKey
+      name: api-key
+      in: header
+    signature:
+      type: apiKey
+      name: signature
+      in: header
+    timestamp:
+      type: apiKey
+      name: timestamp
+      in: header
